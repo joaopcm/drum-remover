@@ -9,5 +9,15 @@
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
+  },
+  "linter": {
+    "rules": {
+      "performance": {
+        // Inline handlers/render props are idiomatic here; base-ui `render`
+        // props recreate elements every render regardless, so this rule adds
+        // useCallback noise without a real win for a desktop UI.
+        "noJsxPropsBind": "off"
+      }
+    }
   }
 }

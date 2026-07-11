@@ -3,8 +3,13 @@ import { contextBridge, ipcRenderer } from "electron";
 import { IpcChannel, type SocrashApi } from "../shared/ipc";
 
 const api: SocrashApi = {
+  addSong: (ytUrl) => ipcRenderer.invoke(IpcChannel.AddSong, ytUrl),
   getAppInfo: () => ipcRenderer.invoke(IpcChannel.GetAppInfo),
   getSettings: () => ipcRenderer.invoke(IpcChannel.GetSettings),
+  listSongs: () => ipcRenderer.invoke(IpcChannel.ListSongs),
+  removeSong: (id) => ipcRenderer.invoke(IpcChannel.RemoveSong, id),
+  resolveYouTubeMeta: (url) =>
+    ipcRenderer.invoke(IpcChannel.ResolveYouTubeMeta, url),
 };
 
 if (process.contextIsolated) {

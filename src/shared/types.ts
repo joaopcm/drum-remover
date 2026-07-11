@@ -51,6 +51,14 @@ export interface JobProgress {
   stage: JobStage;
 }
 
+/** Metadata resolved from a YouTube URL for the add-song preview. */
+export interface YouTubeMeta {
+  author: string | null;
+  thumbnailUrl: string;
+  title: string;
+  videoId: string;
+}
+
 /** Runtime information about the app, surfaced for diagnostics. */
 export interface AppInfo {
   chrome: string;

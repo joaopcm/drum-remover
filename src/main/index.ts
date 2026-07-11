@@ -4,6 +4,12 @@ import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { IpcChannel } from "../shared/ipc";
 import type { AppInfo } from "../shared/types";
 import { getDefaultSettings } from "./settings";
+import {
+  addSong,
+  listSongs as listSongsFromStore,
+  removeSong as removeSongFromStore,
+} from "./store/library";
+import { resolveYouTubeMeta, watchUrl } from "./youtube";
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -51,6 +57,29 @@ function registerIpcHandlers(): void {
   );
 
   ipcMain.handle(IpcChannel.GetSettings, () => getDefaultSettings());
+
+  ipcMain.handle(IpcChannel.ResolveYouTubeMeta, (_event, url: string) =>
+    resolveYouTubeMeta(url)
+  );
+
+  ipcMain.handle(IpcChannel.AddSong, async (_event, ytUrl: string) => {
+    const meta = await resolveYouTubeMeta(ytUrl);
+    const { dataDir } = getDefaultSettings();
+    return addSong(dataDir, {
+      author: meta.author,
+      thumbnailUrl: meta.thumbnailUrl,
+      title: meta.title,
+      ytUrl: watchUrl(meta.videoId),
+    });
+  });
+
+  ipcMain.handle(IpcChannel.ListSongs, () =>
+    listSongsFromStore(getDefaultSettings().dataDir)
+  );
+
+  ipcMain.handle(IpcChannel.RemoveSong, (_event, id: string) =>
+    removeSongFromStore(getDefaultSettings().dataDir, id)
+  );
 }
 
 app.whenReady().then(() => {
