@@ -1,0 +1,26 @@
+electron-builder.yml
+  s_5bc161f2709cc6::t_a77c6e8c345a13 15
+src/main/queue.ts
+  s_5bc161f2709cc6::t_0a3dd89cb2d51d 2
+  s_5bc161f2709cc6::t_d37351c9be823c 123-128,132
+README.md
+  s_5bc161f2709cc6::t_8483ec99eb69a6 3,6,10,12-42,50,61,66-67,69
+src/renderer/src/assets/main.css
+  s_5bc161f2709cc6::t_58f33999550325 48-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "76b5b5b72e4f0a3315f377eed8951fba2934204a",
+  "prompts": {},
+  "sessions": {
+    "s_5bc161f2709cc6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0cd2fd38-7cd9-44b4-bd13-9a74aaca1ca8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
