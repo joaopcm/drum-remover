@@ -1,0 +1,62 @@
+src/main/settings.ts
+  s_5bc161f2709cc6::t_6afb56abdc516e 1-2,8-11,19-62
+src/shared/types.ts
+  s_5bc161f2709cc6::t_6afb56abdc516e 68-84
+  s_5bc161f2709cc6::t_1309fc219c23d8 85
+src/renderer/src/pages/library.tsx
+  s_5bc161f2709cc6::t_6fce0adca9f9f3 101-109
+  s_5bc161f2709cc6::t_9b9e57f3431307 7,14
+  s_5bc161f2709cc6::t_6afb56abdc516e 92-100
+  s_5bc161f2709cc6::t_647d0a03e8244a 110
+src/main/store/move-data.test.ts
+  s_5bc161f2709cc6::t_6afb56abdc516e 1-157
+src/renderer/src/app-view.tsx
+  s_5bc161f2709cc6::t_667943c3150323 63-70,75,79,86,90
+  s_5bc161f2709cc6::t_3de22eb5b3caaa 9-10,15,19
+src/main/store/move-data.ts
+  s_5bc161f2709cc6::t_6afb56abdc516e 1-181
+src/preload/index.ts
+  s_5bc161f2709cc6::t_2846b2b4aaad73 13,27
+  s_5bc161f2709cc6::t_6afb56abdc516e 8,11,20-26,37-39
+  s_5bc161f2709cc6::t_c30f4cf9e869e1 4
+src/main/migration-state.ts
+  s_5bc161f2709cc6::t_6afb56abdc516e 1-15
+src/renderer/src/app.tsx
+  s_5bc161f2709cc6::t_3e287533eb12cb 3,11-21,24
+src/renderer/src/pages/settings.tsx
+  s_5bc161f2709cc6::t_acad94b11b156e 33-34
+  s_5bc161f2709cc6::t_6afb56abdc516e 2-32,35-130,132-255
+  s_5bc161f2709cc6::t_b879441d7018f0 1
+  s_5bc161f2709cc6::t_18022dbd323467 131
+src/renderer/src/lib/format.ts
+  s_5bc161f2709cc6::t_6afb56abdc516e 1-16
+src/main/index.ts
+  s_5bc161f2709cc6::t_71bfd535b4ee3e 5-12,19
+  s_5bc161f2709cc6::t_6afb56abdc516e 20,22,28,146-152,159-161,163,174-175,178-179,184-229
+  s_5bc161f2709cc6::t_23370a0d6b8d6f 81-84
+  s_5bc161f2709cc6::t_0fc445c7b91a10 183
+  s_5bc161f2709cc6::t_09b979d78b710d 232,239
+  s_5bc161f2709cc6::t_ac5b8180e85942 4
+src/shared/ipc.ts
+  s_5bc161f2709cc6::t_acb315870202e9 20
+  s_5bc161f2709cc6::t_55c66891bf998b 30
+  s_5bc161f2709cc6::t_6afb56abdc516e 3,5,17,24-25,33,45-46,49-50,76-79
+  s_5bc161f2709cc6::t_e851af2af22b0a 53-56,62-65
+  s_5bc161f2709cc6::t_9dc21b455f1542 52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "5bdaf47bcfb77303615cb0f8fcdb8ef5af109260",
+  "prompts": {},
+  "sessions": {
+    "s_5bc161f2709cc6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0cd2fd38-7cd9-44b4-bd13-9a74aaca1ca8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
