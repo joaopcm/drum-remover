@@ -14,6 +14,9 @@ interface WaveformProps {
 const LANE_GAP = 10;
 const CENTER_LINE_ALPHA = 0.28;
 const LANE_FILL_ALPHA = 0.85;
+// Volume maps to lane opacity, not height. A muted lane stays clearly visible
+// (never fully transparent) — it just dims toward this floor.
+const LANE_MIN_ALPHA = 0.18;
 
 function cssVar(name: string, fallback: string): string {
   if (typeof window === "undefined") {
@@ -46,13 +49,15 @@ function drawLane(
   ctx.lineTo(width, centerY);
   ctx.stroke();
 
-  if (buckets.length === 0 || volume === 0) {
+  if (buckets.length === 0) {
     ctx.globalAlpha = 1;
     return;
   }
 
   ctx.strokeStyle = color;
-  ctx.globalAlpha = LANE_FILL_ALPHA;
+  // Full-height waveform; volume only controls how opaque the lane is.
+  ctx.globalAlpha =
+    LANE_MIN_ALPHA + volume * (LANE_FILL_ALPHA - LANE_MIN_ALPHA);
   ctx.lineWidth = 1;
   ctx.beginPath();
   for (let px = 0; px < width; px += 1) {
@@ -67,7 +72,7 @@ function drawLane(
         peak = buckets[b];
       }
     }
-    const amp = peak * volume * half;
+    const amp = peak * half;
     const x = px + 0.5;
     ctx.moveTo(x, centerY - amp);
     ctx.lineTo(x, centerY + amp);

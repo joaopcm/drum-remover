@@ -104,7 +104,7 @@ export function MiniPlayer(): React.JSX.Element {
         type="button"
       >
         <span
-          className="absolute inset-y-0 left-0 bg-drum transition-[width] group-hover:bg-drum/90"
+          className="absolute inset-y-0 left-0 origin-left bg-drum transition-colors group-hover:bg-drum/90"
           style={{ width: `${progress}%` }}
         />
       </button>
