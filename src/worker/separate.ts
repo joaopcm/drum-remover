@@ -14,8 +14,8 @@ import {
  * bass, other, vocals) as planar stereo `Float32Array`s. The model normalizes
  * each segment internally, so we feed raw audio and never touch levels here.
  *
- * CoreML is tried first (macOS arm64) and we transparently fall back to the
- * CPU execution provider if it isn't available.
+ * Runs on the CPU execution provider: CoreML compiles this graph but crashes
+ * during inference, so we prefer reliability over the GPU speedup.
  */
 
 /** Input tensor name verified against the published model (also its default). */
@@ -31,20 +31,17 @@ function pickTensorName(
 }
 
 async function createSession(modelPath: string): Promise<InferenceSession> {
-  const base: InferenceSession.SessionOptions = {
+  // CPU execution provider only. CoreML compiles this htdemucs graph (its
+  // GetCapability partitions ~1200 of 1453 nodes) but crashes the utility
+  // process during inference, so we trade some speed for reliability.
+  // The CPU mem arena caches large per-run allocations across segments and
+  // pushes RSS past 4 GB; disabling it keeps peak memory in check.
+  return await InferenceSession.create(modelPath, {
+    enableCpuMemArena: false,
+    enableMemPattern: false,
+    executionProviders: ["cpu"],
     graphOptimizationLevel: "all",
-  };
-  try {
-    return await InferenceSession.create(modelPath, {
-      ...base,
-      executionProviders: ["coreml", "cpu"],
-    });
-  } catch {
-    return await InferenceSession.create(modelPath, {
-      ...base,
-      executionProviders: ["cpu"],
-    });
-  }
+  });
 }
 
 function toStereo(channels: Float32Array[]): Float32Array[] {

@@ -1,6 +1,7 @@
 import { type ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
+
 import type { JobStage, PeaksData } from "../shared/types";
 import { SAMPLE_RATE } from "./overlap-add";
 import { computePeaks, PEAK_BUCKETS, samplesPerBucket, toMono } from "./peaks";
@@ -10,7 +11,6 @@ import type {
   WorkerJobConfig,
   WorkerMessage,
 } from "./protocol";
-import { separateMix, sumStems } from "./separate";
 import { decodeWav, encodeWav } from "./wav";
 
 /**
@@ -179,6 +179,8 @@ async function runSeparate(config: SeparateJobConfig): Promise<void> {
   const buffer = await readFile(config.mixPath);
   const { channels } = decodeWav(toArrayBuffer(buffer));
 
+  // Loaded lazily so download jobs don't pay onnxruntime-node's native init.
+  const { separateMix, sumStems } = await import("./separate");
   const stems = await separateMix(channels, config.modelPaths, (fraction) =>
     reportProgress(config.songId, "separating", fraction * 100)
   );

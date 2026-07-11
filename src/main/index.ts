@@ -73,6 +73,10 @@ function resumeQueue(): void {
 protocol.registerSchemesAsPrivileged([
   {
     privileges: {
+      // corsEnabled is required so the renderer (served from the dev http
+      // origin, or file:// in production) can fetch `app://` cross-origin;
+      // without it the request is blocked before the handler even runs.
+      corsEnabled: true,
       secure: true,
       standard: true,
       stream: true,
@@ -110,7 +114,14 @@ function registerAppProtocol(): void {
       if (resolved !== songsRoot && !resolved.startsWith(songsRoot + sep)) {
         return new Response("Forbidden", { status: 403 });
       }
-      return await net.fetch(pathToFileURL(resolved).toString());
+      const fileResponse = await net.fetch(pathToFileURL(resolved).toString());
+      // Cross-origin fetch from the renderer needs an explicit CORS header.
+      const headers = new Headers(fileResponse.headers);
+      headers.set("Access-Control-Allow-Origin", "*");
+      return new Response(fileResponse.body, {
+        headers,
+        status: fileResponse.status,
+      });
     } catch {
       return notFound;
     }

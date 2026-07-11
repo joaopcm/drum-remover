@@ -25,6 +25,8 @@ import {
  * separation interrupted by a crash resumes on next launch.
  */
 
+const NEWLINE_SPLIT_RE = /\r?\n/;
+
 interface QueueDeps {
   broadcastProgress: (progress: JobProgress) => void;
   broadcastSong: (song: Song) => void;
@@ -84,7 +86,25 @@ function runWorker(
         resolve(result);
       }
     };
-    const child = utilityProcess.fork(join(import.meta.dirname, "worker.js"));
+    const child = utilityProcess.fork(
+      join(import.meta.dirname, "worker.js"),
+      [],
+      {
+        stdio: "pipe",
+      }
+    );
+
+    // Capture worker output so a native crash (e.g. in onnxruntime) surfaces a
+    // useful message instead of a bare exit code. Also mirror it to the main
+    // process stderr for `pnpm dev` visibility.
+    let captured = "";
+    const collect = (chunk: Buffer): void => {
+      const text = chunk.toString();
+      captured = `${captured}${text}`.slice(-4000);
+      process.stderr.write(text);
+    };
+    child.stdout?.on("data", collect);
+    child.stderr?.on("data", collect);
 
     child.on("message", (msg: WorkerMessage) => {
       if (msg.type === "progress") {
@@ -99,8 +119,16 @@ function runWorker(
     });
 
     child.on("exit", (code) => {
+      const tail = captured
+        .split(NEWLINE_SPLIT_RE)
+        .map((l) => l.trim())
+        .filter(Boolean)
+        .slice(-2)
+        .join(" — ");
       finish({
-        message: `Worker exited unexpectedly (code ${code}).`,
+        message: tail
+          ? `Worker crashed (code ${code}): ${tail}`.slice(0, 300)
+          : `Worker exited unexpectedly (code ${code}).`,
         type: "error",
       });
     });
