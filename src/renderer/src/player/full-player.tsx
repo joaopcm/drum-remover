@@ -10,7 +10,7 @@ import { usePlayer } from "./player-provider";
 import { Waveform } from "./waveform";
 
 export function FullPlayer(): React.JSX.Element {
-  const { activeSongId, closePlayer } = useAppView();
+  const { activeSongId, minimizePlayer } = useAppView();
   const {
     load,
     play,
@@ -110,7 +110,7 @@ export function FullPlayer(): React.JSX.Element {
         <Button
           aria-label="Minimize player"
           className="no-drag"
-          onClick={closePlayer}
+          onClick={minimizePlayer}
           size="icon"
           variant="ghost"
         >

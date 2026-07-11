@@ -51,3 +51,19 @@ export function timeToFraction(sec: number, durationSec: number): number {
   }
   return Math.min(1, Math.max(0, sec / durationSec));
 }
+
+/**
+ * Convert a horizontal pixel offset within a progress track of the given width
+ * to a time in seconds. Used by the mini-player's click-to-seek bar. A
+ * non-positive width means the track hasn't laid out yet, so seek to the start.
+ */
+export function offsetToTime(
+  offsetX: number,
+  width: number,
+  durationSec: number
+): number {
+  if (width <= 0) {
+    return 0;
+  }
+  return fractionToTime(offsetX / width, durationSec);
+}

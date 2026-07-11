@@ -3,6 +3,7 @@ import {
   clampTime,
   currentPosition,
   fractionToTime,
+  offsetToTime,
   timeToFraction,
 } from "./time";
 
@@ -59,5 +60,20 @@ describe("fractionToTime / timeToFraction", () => {
 
   it("returns 0 fraction for a zero duration", () => {
     expect(timeToFraction(5, 0)).toBe(0);
+  });
+});
+
+describe("offsetToTime", () => {
+  it("maps a click at the track midpoint to half the duration", () => {
+    expect(offsetToTime(100, 200, 120)).toBe(60);
+  });
+
+  it("clamps clicks past either edge of the track", () => {
+    expect(offsetToTime(-20, 200, 120)).toBe(0);
+    expect(offsetToTime(260, 200, 120)).toBe(120);
+  });
+
+  it("seeks to the start when the track has no width yet", () => {
+    expect(offsetToTime(50, 0, 120)).toBe(0);
   });
 });
