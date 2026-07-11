@@ -1,0 +1,35 @@
+src/renderer/src/player/time.ts
+  s_ee206b25e533e5::t_00a5f1b324ac5e 54-69
+src/renderer/src/pages/library.tsx
+  s_ee206b25e533e5::t_1c46404cbf9c7e 88-93
+  s_ee206b25e533e5::t_2c5f7e6622683f 1,5,11-12
+src/renderer/src/player/mini-player.tsx
+  s_ee206b25e533e5::t_ec8c4065545885 1-155
+  s_ee206b25e533e5::t_56f045341a3f3d 156-159
+src/renderer/src/player/full-player.tsx
+  s_ee206b25e533e5::t_3f91d22eddea60 113
+  s_ee206b25e533e5::t_6dd18cbd39d7be 13
+src/renderer/src/app.tsx
+  s_ee206b25e533e5::t_6042a7388e49cf 4,8-15
+src/renderer/src/player/time.test.ts
+  s_ee206b25e533e5::t_a6270686b0747b 6
+  s_ee206b25e533e5::t_919e087ee516d2 65-79
+src/renderer/src/app-view.tsx
+  s_ee206b25e533e5::t_bcae491bcb098f 9,15-16,18,26-29,38,42,47-48,52-60,62-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "718139ddd80493bcf9c03f75ad258a83f6660d0c",
+  "prompts": {},
+  "sessions": {
+    "s_ee206b25e533e5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "47d2832b-9d94-4047-9806-4e0aa29b64ce",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
