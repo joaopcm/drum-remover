@@ -1,0 +1,21 @@
+.github/workflows/ci.yml
+  s_5bc161f2709cc6::t_9a55643638de7d 1-56
+.github/workflows/release.yml
+  s_5bc161f2709cc6::t_b71afda25db2cb 1-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "de2829476768a67e0b94177ded1a001d39091844",
+  "prompts": {},
+  "sessions": {
+    "s_5bc161f2709cc6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0cd2fd38-7cd9-44b4-bd13-9a74aaca1ca8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
