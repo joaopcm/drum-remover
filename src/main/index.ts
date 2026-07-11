@@ -113,11 +113,13 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
+  const settings = getDefaultSettings();
   initQueue({
     broadcastProgress: (progress) =>
       broadcast(IpcChannel.JobProgress, progress),
     broadcastSong: (song) => broadcast(IpcChannel.SongUpdate, song),
-    dataDir: getDefaultSettings().dataDir,
+    dataDir: settings.dataDir,
+    modelQuality: settings.modelQuality,
   });
 
   registerIpcHandlers();

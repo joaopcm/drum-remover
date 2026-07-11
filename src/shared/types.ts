@@ -51,6 +51,20 @@ export interface JobProgress {
   stage: JobStage;
 }
 
+/**
+ * Precomputed waveform peaks for the player (issue #5). Written to
+ * `<dataDir>/songs/<id>/peaks.json` by the separation worker and consumed by
+ * the renderer to draw the drums/rest waveforms without decoding audio. Each
+ * array holds ~2000 peak magnitudes normalized to 0..1, one per bucket.
+ */
+export interface PeaksData {
+  drums: number[];
+  rest: number[];
+  sampleRate: number;
+  samplesPerBucket: number;
+  version: 1;
+}
+
 /** Metadata resolved from a YouTube URL for the add-song preview. */
 export interface YouTubeMeta {
   author: string | null;

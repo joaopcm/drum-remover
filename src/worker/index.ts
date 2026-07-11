@@ -1,19 +1,31 @@
 import { type ChildProcessWithoutNullStreams, spawn } from "node:child_process";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import type { JobStage } from "../shared/types";
-import type { WorkerJobConfig, WorkerMessage } from "./protocol";
+import type { JobStage, PeaksData } from "../shared/types";
+import { SAMPLE_RATE } from "./overlap-add";
+import { computePeaks, PEAK_BUCKETS, samplesPerBucket, toMono } from "./peaks";
+import type {
+  DownloadJobConfig,
+  SeparateJobConfig,
+  WorkerJobConfig,
+  WorkerMessage,
+} from "./protocol";
+import { separateMix, sumStems } from "./separate";
+import { decodeWav, encodeWav } from "./wav";
 
 /**
  * Pipeline worker. Runs inside an Electron `utilityProcess` (a Node.js child,
- * NOT the main process) so the CPU/IO-heavy download + transcode never blocks
- * windowing or IPC. It receives a single {@link WorkerJobConfig}, streams
- * progress back to main, then reports `done` (with the extracted duration) or
- * `error` and exits.
+ * NOT the main process) so the CPU/IO-heavy download, transcode, and ONNX
+ * separation never block windowing or IPC. It receives a single
+ * {@link WorkerJobConfig}, streams progress back to main, then reports `done`
+ * or `error` and exits.
  *
- * Pipeline: yt-dlp fetches bestaudio → `original.m4a`, then ffmpeg transcodes
- * to a 44.1 kHz stereo float32 WAV → `mix.wav` (the exact input the separation
- * model in issue #4 expects).
+ * Two job kinds:
+ * - `download`: yt-dlp fetches bestaudio → `original.m4a`, ffmpeg transcodes to
+ *   44.1 kHz stereo float32 → `mix.wav`.
+ * - `separate`: HT-Demucs (ONNX) splits `mix.wav` into `drums.wav` + `rest.wav`
+ *   (bass + other + vocals summed), writes `peaks.json`, and deletes the
+ *   intermediates.
  */
 
 const DOWNLOAD_PCT_RE = /\[download\]\s+([\d.]+)%/;
@@ -45,7 +57,7 @@ function hmsToSeconds(h: string, m: string, s: string): number {
   return Number(h) * 3600 + Number(m) * 60 + Number(s);
 }
 
-function download(config: WorkerJobConfig): Promise<void> {
+function download(config: DownloadJobConfig): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(config.ytdlpPath, [
       "--no-playlist",
@@ -91,7 +103,7 @@ function wireDownload(
 }
 
 /** Transcode to WAV. Resolves with the media duration in seconds (or null). */
-function convert(config: WorkerJobConfig): Promise<number | null> {
+function convert(config: DownloadJobConfig): Promise<number | null> {
   return new Promise((resolve, reject) => {
     const child = spawn(config.ffmpegPath, [
       "-y",
@@ -145,7 +157,7 @@ function wireConvert(
   });
 }
 
-async function runJob(config: WorkerJobConfig): Promise<void> {
+async function runDownload(config: DownloadJobConfig): Promise<void> {
   await mkdir(dirname(config.mixPath), { recursive: true });
   reportProgress(config.songId, "downloading", 0);
   await download(config);
@@ -153,6 +165,49 @@ async function runJob(config: WorkerJobConfig): Promise<void> {
   const durationSec = await convert(config);
   reportProgress(config.songId, "finalizing", 100);
   post({ durationSec, songId: config.songId, type: "done" });
+}
+
+/** Copy the WAV bytes out of the Buffer into a standalone ArrayBuffer. */
+function toArrayBuffer(buffer: Buffer): ArrayBuffer {
+  const copy = new Uint8Array(buffer.byteLength);
+  copy.set(buffer);
+  return copy.buffer;
+}
+
+async function runSeparate(config: SeparateJobConfig): Promise<void> {
+  reportProgress(config.songId, "separating", 0);
+  const buffer = await readFile(config.mixPath);
+  const { channels } = decodeWav(toArrayBuffer(buffer));
+
+  const stems = await separateMix(channels, config.modelPath, (fraction) =>
+    reportProgress(config.songId, "separating", fraction * 100)
+  );
+
+  reportProgress(config.songId, "finalizing", 0);
+  const [drums, bass, other, vocals] = stems;
+  const rest = sumStems([bass, other, vocals]);
+  await writeFile(config.drumsPath, encodeWav(drums, SAMPLE_RATE));
+  await writeFile(config.restPath, encodeWav(rest, SAMPLE_RATE));
+
+  const drumsMono = toMono(drums);
+  const restMono = toMono(rest);
+  const peaks: PeaksData = {
+    drums: computePeaks(drumsMono, PEAK_BUCKETS),
+    rest: computePeaks(restMono, PEAK_BUCKETS),
+    sampleRate: SAMPLE_RATE,
+    samplesPerBucket: samplesPerBucket(drumsMono.length, PEAK_BUCKETS),
+    version: 1,
+  };
+  await writeFile(config.peaksPath, JSON.stringify(peaks));
+
+  await rm(config.originalPath, { force: true });
+  await rm(config.mixPath, { force: true });
+  reportProgress(config.songId, "finalizing", 100);
+  post({ durationSec: null, songId: config.songId, type: "done" });
+}
+
+function runJob(config: WorkerJobConfig): Promise<void> {
+  return config.kind === "download" ? runDownload(config) : runSeparate(config);
 }
 
 function handleMessage(config: WorkerJobConfig): void {

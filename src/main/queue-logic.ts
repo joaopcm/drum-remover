@@ -34,6 +34,44 @@ export function pickNextSong(songs: readonly Song[]): Song | null {
   return next;
 }
 
+/** The kind of work a picked song needs next. */
+export type JobKind = "download" | "separate";
+
+/** A song paired with the job it should run next. */
+export interface NextJob {
+  kind: JobKind;
+  song: Song;
+}
+
+/**
+ * Pick the next job across both pipeline stages, FIFO by `createdAt`. A
+ * `queued` song needs a `download`; a `separating` song whose `mix.wav` is
+ * already on disk needs a `separate` (this covers both the normal handoff from
+ * the download stage and resuming a separation interrupted by a crash). Songs
+ * in any other state, or `separating` without a `mix.wav`, are skipped.
+ */
+export function pickNextJob(
+  songs: readonly Song[],
+  hasMix: (songId: string) => boolean
+): NextJob | null {
+  let best: NextJob | null = null;
+  for (const song of songs) {
+    let kind: JobKind | null = null;
+    if (song.status === "queued") {
+      kind = "download";
+    } else if (song.status === "separating" && hasMix(song.id)) {
+      kind = "separate";
+    }
+    if (kind === null) {
+      continue;
+    }
+    if (best === null || song.createdAt < best.song.createdAt) {
+      best = { kind, song };
+    }
+  }
+  return best;
+}
+
 /**
  * Compute the library state after a launch-time recovery pass.
  *

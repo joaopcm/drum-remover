@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Song, SongStatus } from "../shared/types";
-import { computeLaunchReset, pickNextSong } from "./queue-logic";
+import { computeLaunchReset, pickNextJob, pickNextSong } from "./queue-logic";
 
 function song(id: string, status: SongStatus, createdAt: number): Song {
   return {
@@ -40,6 +40,54 @@ describe("pickNextSong", () => {
       song("queued", "queued", 100),
     ];
     expect(pickNextSong(songs)?.id).toBe("queued");
+  });
+});
+
+describe("pickNextJob", () => {
+  const noMix = () => false;
+
+  it("returns null when nothing is actionable", () => {
+    expect(pickNextJob([], noMix)).toBeNull();
+    expect(
+      pickNextJob([song("a", "ready", 1), song("b", "error", 2)], noMix)
+    ).toBeNull();
+  });
+
+  it("picks a queued song as a download job", () => {
+    const job = pickNextJob([song("a", "queued", 1)], noMix);
+    expect(job).toEqual({
+      kind: "download",
+      song: expect.objectContaining({ id: "a" }),
+    });
+  });
+
+  it("picks a separating song with a mix as a separate job", () => {
+    const hasMix = (id: string) => id === "a";
+    const job = pickNextJob([song("a", "separating", 1)], hasMix);
+    if (job === null) {
+      throw new Error("expected a job");
+    }
+    expect(job.kind).toBe("separate");
+    expect(job.song.id).toBe("a");
+  });
+
+  it("skips a separating song whose mix is missing", () => {
+    expect(pickNextJob([song("a", "separating", 1)], noMix)).toBeNull();
+  });
+
+  it("orders both job kinds by createdAt (FIFO)", () => {
+    const hasMix = () => true;
+    const songs = [
+      song("newDownload", "queued", 300),
+      song("oldSeparate", "separating", 100),
+      song("midDownload", "queued", 200),
+    ];
+    const job = pickNextJob(songs, hasMix);
+    if (job === null) {
+      throw new Error("expected a job");
+    }
+    expect(job.song.id).toBe("oldSeparate");
+    expect(job.kind).toBe("separate");
   });
 });
 
