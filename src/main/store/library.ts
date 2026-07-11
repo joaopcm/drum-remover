@@ -93,6 +93,35 @@ export function addSong(dataDir: string, input: NewSongInput): Promise<Song> {
   });
 }
 
+/** Fields of a song that the pipeline may mutate after creation. */
+export type SongPatch = Partial<
+  Pick<Song, "durationSec" | "error" | "status" | "title" | "author">
+>;
+
+/**
+ * Apply a partial update to a single song and persist it. Returns the updated
+ * song, or `null` if no song with that id exists. Used by the job queue to
+ * record status/progress/duration transitions atomically.
+ */
+export function updateSong(
+  dataDir: string,
+  id: string,
+  patch: SongPatch
+): Promise<Song | null> {
+  return withLock(dataDir, async () => {
+    const songs = await readLibrary(dataDir);
+    const index = songs.findIndex((s) => s.id === id);
+    if (index === -1) {
+      return null;
+    }
+    const updated: Song = { ...songs[index], ...patch, id: songs[index].id };
+    const next = [...songs];
+    next[index] = updated;
+    await writeLibrary(dataDir, next);
+    return updated;
+  });
+}
+
 /** Remove a song and best-effort delete its on-disk folder. */
 export function removeSong(dataDir: string, id: string): Promise<void> {
   return withLock(dataDir, async () => {

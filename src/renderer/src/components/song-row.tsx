@@ -14,22 +14,27 @@ import {
   DropdownMenuTrigger,
 } from "@renderer/components/ui/dropdown-menu";
 import { formatDuration } from "@renderer/lib/format";
-import { statusMeta } from "@renderer/lib/song-status";
-import type { Song } from "@shared/types";
-import { Loader2, MoreVertical, Music, Trash2 } from "lucide-react";
+import { stageLabel, statusMeta } from "@renderer/lib/song-status";
+import type { JobProgress, Song } from "@shared/types";
+import { Loader2, MoreVertical, Music, RotateCw, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface SongRowProps {
   onRemoved: (id: string) => void;
+  progress?: JobProgress;
   song: Song;
 }
 
-export function SongRow({ song, onRemoved }: SongRowProps) {
+export function SongRow({ song, onRemoved, progress }: SongRowProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const status = statusMeta(song.status);
   const processing =
     song.status === "downloading" || song.status === "separating";
+  const badgeLabel =
+    processing && progress
+      ? `${stageLabel(progress.stage)} ${Math.round(progress.pct)}%`
+      : status.label;
 
   function handleDelete() {
     setDeleting(true);
@@ -42,8 +47,15 @@ export function SongRow({ song, onRemoved }: SongRowProps) {
       });
   }
 
+  function handleRetry() {
+    window.api.retrySong(song.id).catch(() => {
+      // Main pushes a `song:update` on success; on failure the row is
+      // unchanged and the user can retry again.
+    });
+  }
+
   return (
-    <div className="flex items-center gap-4 rounded-[var(--radius)] border border-border bg-card px-4 py-3 transition-colors hover:border-border/80">
+    <div className="relative flex items-center gap-4 overflow-hidden rounded-[var(--radius)] border border-border bg-card px-4 py-3 transition-colors hover:border-border/80">
       <div className="relative aspect-video w-20 shrink-0 overflow-hidden rounded-md border border-border bg-background">
         {song.thumbnailUrl ? (
           <img
@@ -66,7 +78,9 @@ export function SongRow({ song, onRemoved }: SongRowProps) {
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-sm">{song.title}</p>
         <p className="truncate text-muted text-xs">
-          {song.author ?? "Unknown artist"}
+          {song.status === "error" && song.error
+            ? song.error
+            : (song.author ?? "Unknown artist")}
         </p>
       </div>
 
@@ -76,7 +90,7 @@ export function SongRow({ song, onRemoved }: SongRowProps) {
         </span>
       )}
 
-      <Badge tone={status.tone}>{status.label}</Badge>
+      <Badge tone={status.tone}>{badgeLabel}</Badge>
 
       <DropdownMenu>
         <DropdownMenuTrigger
@@ -87,6 +101,12 @@ export function SongRow({ song, onRemoved }: SongRowProps) {
           }
         />
         <DropdownMenuContent>
+          {song.status === "error" ? (
+            <DropdownMenuItem onClick={handleRetry}>
+              <RotateCw className="size-4" />
+              Retry
+            </DropdownMenuItem>
+          ) : null}
           <DropdownMenuItem
             className="text-destructive"
             onClick={() => setConfirmOpen(true)}
@@ -96,6 +116,19 @@ export function SongRow({ song, onRemoved }: SongRowProps) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {processing ? (
+        <div className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden bg-border/50">
+          {progress ? (
+            <div
+              className="h-full bg-rest transition-[width] duration-300 ease-out"
+              style={{ width: `${Math.round(progress.pct)}%` }}
+            />
+          ) : (
+            <div className="h-full w-1/3 animate-pulse bg-rest" />
+          )}
+        </div>
+      ) : null}
 
       <AlertDialog onOpenChange={setConfirmOpen} open={confirmOpen}>
         <AlertDialogPopup>

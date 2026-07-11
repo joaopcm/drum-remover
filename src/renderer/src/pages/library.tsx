@@ -1,13 +1,17 @@
 import { AddSongDialog } from "@renderer/components/add-song-dialog";
 import { SongRow } from "@renderer/components/song-row";
 import { Button } from "@renderer/components/ui/button";
-import type { AppInfo, Song } from "@shared/types";
+import type { AppInfo, JobProgress, Song } from "@shared/types";
 import { AudioWaveform, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+
+/** Stages that mean a job is no longer actively reporting progress. */
+const TERMINAL_STATUSES = new Set<Song["status"]>(["ready", "error", "queued"]);
 
 export function Library(): React.JSX.Element {
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
+  const [progress, setProgress] = useState<Record<string, JobProgress>>({});
   const [addOpen, setAddOpen] = useState(false);
 
   useEffect(() => {
@@ -37,8 +41,35 @@ export function Library(): React.JSX.Element {
     };
   }, []);
 
+  useEffect(() => {
+    const offSong = window.api.onSongUpdate((updated) => {
+      setSongs((prev) => {
+        const exists = prev.some((s) => s.id === updated.id);
+        return exists
+          ? prev.map((s) => (s.id === updated.id ? updated : s))
+          : [updated, ...prev];
+      });
+      // A song that reached a resting state no longer has live progress.
+      if (TERMINAL_STATUSES.has(updated.status)) {
+        setProgress((prev) => {
+          const { [updated.id]: _removed, ...rest } = prev;
+          return rest;
+        });
+      }
+    });
+    const offProgress = window.api.onJobProgress((update) => {
+      setProgress((prev) => ({ ...prev, [update.songId]: update }));
+    });
+    return () => {
+      offSong();
+      offProgress();
+    };
+  }, []);
+
   function handleAdded(song: Song) {
-    setSongs((prev) => [song, ...prev]);
+    setSongs((prev) =>
+      prev.some((s) => s.id === song.id) ? prev : [song, ...prev]
+    );
   }
 
   function handleRemoved(id: string) {
@@ -83,7 +114,12 @@ export function Library(): React.JSX.Element {
         ) : (
           <div className="mx-auto flex max-w-3xl flex-col gap-2 p-6">
             {songs.map((song) => (
-              <SongRow key={song.id} onRemoved={handleRemoved} song={song} />
+              <SongRow
+                key={song.id}
+                onRemoved={handleRemoved}
+                progress={progress[song.id]}
+                song={song}
+              />
             ))}
           </div>
         )}
