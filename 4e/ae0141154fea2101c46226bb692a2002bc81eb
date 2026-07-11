@@ -1,0 +1,63 @@
+src/preload/index.ts
+  s_5bc161f2709cc6::t_62e6a97b00a2e2 15-16,18
+  s_5bc161f2709cc6::t_4e88768e412f8c 13
+  s_5bc161f2709cc6::t_a2c7e453874b1c 37-44
+  s_5bc161f2709cc6::t_b5af0709c2be18 4-9
+  s_5bc161f2709cc6::t_82d3ddc70559ce 35-36
+src/worker/separate.ts
+  s_5bc161f2709cc6::t_bd1a335365a7a5 60-62,98-126
+  s_5bc161f2709cc6::t_f19a13ba2552fb 127-128
+src/worker/protocol.ts
+  s_5bc161f2709cc6::t_c1205d501aa429 37-38
+  s_5bc161f2709cc6::t_011aba14233bbb 36,39-40
+src/main/provision/models.ts
+  s_5bc161f2709cc6::t_7a88c5b9aaa537 187-188,210-217
+  s_5bc161f2709cc6::t_e539b321faf2b7 138-139,143-146
+  s_5bc161f2709cc6::t_03f303504a43f6 31,33-34,36-40,42-85,94
+  s_5bc161f2709cc6::t_8f832e8ecf589c 173-177,181-182,189,200,203,221-240
+src/main/queue.ts
+  s_5bc161f2709cc6::t_4e88768e412f8c 157-165
+  s_5bc161f2709cc6::t_76b87ce58a0a49 173
+  s_5bc161f2709cc6::t_0e774a5daff51a 46-58
+src/main/index.ts
+  s_5bc161f2709cc6::t_6845e289f527ee 302-304
+  s_5bc161f2709cc6::t_f0f608f24bf2b0 19-27,29-33
+  s_5bc161f2709cc6::t_28d18c9e860a09 51
+  s_5bc161f2709cc6::t_4452dc97790dba 182-227
+  s_5bc161f2709cc6::t_3cdd4ec79f75ec 34-40
+  s_5bc161f2709cc6::t_25daf274dc8c00 168-177
+src/renderer/src/pages/settings.tsx
+  s_5bc161f2709cc6::t_fc5a70af54f8e4 2
+  s_5bc161f2709cc6::t_b09b4d5f798a75 204-205,209-213
+src/shared/ipc.ts
+  s_5bc161f2709cc6::t_7d08736681fe38 84-87
+  s_5bc161f2709cc6::t_142b09ce4db0c1 6-8
+  s_5bc161f2709cc6::t_913f257d5d305a 53-54,57-62,64-65
+  s_5bc161f2709cc6::t_c42514c8f2d3b2 20,22,24,31-32
+src/worker/index.ts
+  s_5bc161f2709cc6::t_f0b81b8c4e9629 182
+src/renderer/src/components/quality-picker.tsx
+  s_5bc161f2709cc6::t_d1771927d99176 197-209
+  s_5bc161f2709cc6::t_1446ac46cb7fcd 1-30,37-39,132-196,210-216
+  s_5bc161f2709cc6::t_b5e94f3c3e88d0 40-131
+  s_5bc161f2709cc6::t_4e88768e412f8c 31-36
+src/shared/types.ts
+  s_5bc161f2709cc6::t_c9387b05381570 33-37,39-45,47-48
+  s_5bc161f2709cc6::t_4e88768e412f8c 38,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "4eae0141154fea2101c46226bb692a2002bc81eb",
+  "prompts": {},
+  "sessions": {
+    "s_5bc161f2709cc6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0cd2fd38-7cd9-44b4-bd13-9a74aaca1ca8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
