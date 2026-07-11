@@ -1,0 +1,47 @@
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0c0e12;
+  --color-card: #14171d;
+  --color-foreground: #e8eaed;
+  --color-muted: #8b90a0;
+  --color-border: #23262f;
+  --color-drum: #f5a623;
+  --color-rest: #5b8def;
+  --color-destructive: #e5484d;
+
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+
+  --radius: 0.625rem;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-foreground);
+  user-select: none;
+  background-color: var(--color-background);
+}
+
+/* Draggable window region for the frameless macOS title bar. */
+.drag-region {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
