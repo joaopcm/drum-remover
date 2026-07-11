@@ -30,6 +30,22 @@ export interface Song {
  */
 export type ModelQuality = "fast" | "balanced" | "best";
 
+/** All qualities, ordered fast → best, for rendering the settings picker. */
+export const MODEL_QUALITIES: ModelQuality[] = ["fast", "balanced", "best"];
+
+/** Download size + local availability of a separation model. */
+export interface ModelStatus {
+  bytes: number;
+  quality: ModelQuality;
+  ready: boolean;
+}
+
+/** Progress of an in-flight model download (0..100). */
+export interface ModelDownloadProgress {
+  pct: number;
+  quality: ModelQuality;
+}
+
 /** Persisted user settings. `dataDir` is where all song data + models live. */
 export interface Settings {
   dataDir: string;

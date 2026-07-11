@@ -1,12 +1,21 @@
 import { electronAPI } from "@electron-toolkit/preload";
 import { contextBridge, type IpcRendererEvent, ipcRenderer } from "electron";
 import { IpcChannel, type SocrashApi } from "../shared/ipc";
-import type { JobProgress, MigrationProgress, Song } from "../shared/types";
+import type {
+  JobProgress,
+  MigrationProgress,
+  ModelDownloadProgress,
+  Song,
+} from "../shared/types";
 
 const api: SocrashApi = {
   addSong: (ytUrl) => ipcRenderer.invoke(IpcChannel.AddSong, ytUrl),
+  cancelModelDownload: () => ipcRenderer.invoke(IpcChannel.CancelModelDownload),
   chooseDataDir: () => ipcRenderer.invoke(IpcChannel.ChooseDataDir),
+  downloadModel: (quality) =>
+    ipcRenderer.invoke(IpcChannel.DownloadModel, quality),
   getAppInfo: () => ipcRenderer.invoke(IpcChannel.GetAppInfo),
+  getModelStatuses: () => ipcRenderer.invoke(IpcChannel.GetModelStatuses),
   getSettings: () => ipcRenderer.invoke(IpcChannel.GetSettings),
   isMigrating: () => ipcRenderer.invoke(IpcChannel.IsMigrating),
   listSongs: () => ipcRenderer.invoke(IpcChannel.ListSongs),
@@ -23,6 +32,16 @@ const api: SocrashApi = {
     ipcRenderer.on(IpcChannel.MigrationProgress, listener);
     return () => {
       ipcRenderer.removeListener(IpcChannel.MigrationProgress, listener);
+    };
+  },
+  onModelDownloadProgress: (callback) => {
+    const listener = (
+      _event: IpcRendererEvent,
+      progress: ModelDownloadProgress
+    ) => callback(progress);
+    ipcRenderer.on(IpcChannel.ModelDownloadProgress, listener);
+    return () => {
+      ipcRenderer.removeListener(IpcChannel.ModelDownloadProgress, listener);
     };
   },
   onSongUpdate: (cb) => {

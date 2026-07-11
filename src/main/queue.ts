@@ -43,6 +43,19 @@ export function initQueue(next: QueueDeps): void {
   deps = next;
 }
 
+/**
+ * Update the data dir / model quality the queue uses for future jobs, after the
+ * user changes settings. The pump reads these fresh on each cycle, so in-flight
+ * jobs finish with their original config and the next job picks up the change.
+ */
+export function updateQueueConfig(
+  patch: Partial<Pick<QueueDeps, "dataDir" | "modelQuality">>
+): void {
+  if (deps !== null) {
+    deps = { ...deps, ...patch };
+  }
+}
+
 async function setStatus(
   d: QueueDeps,
   id: string,
@@ -141,12 +154,15 @@ async function processSeparate(d: QueueDeps, song: Song): Promise<void> {
   d.broadcastProgress({ pct: 0, songId: song.id, stage: "provisioning" });
 
   try {
-    const modelPath = await ensureModel(d.dataDir, d.modelQuality, (fraction) =>
-      d.broadcastProgress({
-        pct: fraction * 100,
-        songId: song.id,
-        stage: "provisioning",
-      })
+    const modelPaths = await ensureModel(
+      d.dataDir,
+      d.modelQuality,
+      (fraction) =>
+        d.broadcastProgress({
+          pct: fraction * 100,
+          songId: song.id,
+          stage: "provisioning",
+        })
     );
     const dir = songDir(d.dataDir, song.id);
     const result = await runWorker(
@@ -154,7 +170,7 @@ async function processSeparate(d: QueueDeps, song: Song): Promise<void> {
         drumsPath: join(dir, "drums.wav"),
         kind: "separate",
         mixPath: join(dir, "mix.wav"),
-        modelPath,
+        modelPaths,
         originalPath: join(dir, "original.m4a"),
         peaksPath: join(dir, "peaks.json"),
         quality: d.modelQuality,

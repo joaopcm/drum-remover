@@ -1,4 +1,5 @@
 import { useAppView } from "@renderer/app-view";
+import { QualityPicker } from "@renderer/components/quality-picker";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -6,7 +7,6 @@ import {
   AlertDialogPopup,
   AlertDialogTitle,
 } from "@renderer/components/ui/alert-dialog";
-import { Badge } from "@renderer/components/ui/badge";
 import { Button } from "@renderer/components/ui/button";
 import {
   Card,
@@ -23,12 +23,6 @@ import type {
 } from "@shared/types";
 import { ArrowLeft, FolderOpen, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-
-const QUALITY_LABEL: Record<SettingsType["modelQuality"], string> = {
-  balanced: "Balanced",
-  best: "Best",
-  fast: "Fast",
-};
 
 export function Settings(): React.JSX.Element {
   const { closeSettings } = useAppView();
@@ -207,13 +201,16 @@ export function Settings(): React.JSX.Element {
               <CardHeader>
                 <CardTitle>Separation quality</CardTitle>
                 <CardDescription>
-                  The model used to pull drums out of a track.
+                  The model Socrash uses to pull drums out of a track. Changing
+                  this only affects songs you add from now on.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Badge tone="drum">
-                  {QUALITY_LABEL[settings.modelQuality]}
-                </Badge>
+                <QualityPicker
+                  activeQuality={settings.modelQuality}
+                  disabled={migrating}
+                  onQualityChange={setSettings}
+                />
               </CardContent>
             </Card>
           ) : null}

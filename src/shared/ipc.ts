@@ -3,6 +3,9 @@ import type {
   DataDirValidation,
   JobProgress,
   MigrationProgress,
+  ModelDownloadProgress,
+  ModelQuality,
+  ModelStatus,
   Settings,
   Song,
   YouTubeMeta,
@@ -14,14 +17,19 @@ import type {
  */
 export const IpcChannel = {
   AddSong: "songs:add",
+  CancelModelDownload: "models:cancel",
   ChooseDataDir: "settings:choose-data-dir",
+  DownloadModel: "models:download",
   GetAppInfo: "app:get-info",
+  GetModelStatuses: "models:statuses",
   GetSettings: "settings:get",
   IsMigrating: "settings:is-migrating",
   /** main→renderer push: fine-grained job progress ({songId, stage, pct}). */
   JobProgress: "job:progress",
   ListSongs: "songs:list",
   MigrationProgress: "settings:migration-progress",
+  /** main→renderer push: model download progress ({quality, pct}). */
+  ModelDownloadProgress: "models:download-progress",
   MoveDataDir: "settings:move-data-dir",
   RemoveSong: "songs:remove",
   ResolveYouTubeMeta: "youtube:resolve-meta",
@@ -42,9 +50,19 @@ export type IpcChannelName = (typeof IpcChannel)[keyof typeof IpcChannel];
 export interface SocrashApi {
   /** Add a song to the library in `queued` status. Rejects on invalid/duplicate URLs. */
   addSong: (ytUrl: string) => Promise<Song>;
+  /** Cancel an in-flight model download started by `downloadModel`. */
+  cancelModelDownload: () => Promise<void>;
   /** Open a native folder picker for a new data directory. Resolves null if cancelled. */
   chooseDataDir: () => Promise<string | null>;
+  /**
+   * Download the model for `quality` (if needed) then make it the active
+   * separation quality. Progress arrives via `onModelDownloadProgress`.
+   * Resolves the updated settings; rejects/aborts leave the choice unchanged.
+   */
+  downloadModel: (quality: ModelQuality) => Promise<Settings>;
   getAppInfo: () => Promise<AppInfo>;
+  /** Download size + local availability for every separation quality. */
+  getModelStatuses: () => Promise<ModelStatus[]>;
   getSettings: () => Promise<Settings>;
   /** Whether a data-directory migration is currently in progress. */
   isMigrating: () => Promise<boolean>;
@@ -62,6 +80,10 @@ export interface SocrashApi {
   /** Subscribe to migration progress. Returns an unsubscribe function. */
   onMigrationProgress: (
     callback: (progress: MigrationProgress) => void
+  ) => () => void;
+  /** Subscribe to model download progress. Returns an unsubscribe function. */
+  onModelDownloadProgress: (
+    callback: (progress: ModelDownloadProgress) => void
   ) => () => void;
   /**
    * Subscribe to song state changes pushed from main (status/duration/error).

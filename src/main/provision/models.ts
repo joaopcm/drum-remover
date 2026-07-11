@@ -28,13 +28,61 @@ interface ModelSpec {
   files: ModelFile[];
 }
 
-const HF_FAST_BASE =
+const HF_SINGLE_BASE =
   "https://huggingface.co/StemSplitio/htdemucs-onnx/resolve/main";
+const HF_FT_BASE =
+  "https://huggingface.co/StemSplitio/htdemucs-ft-onnx/resolve/main";
 
+/**
+ * `best` is the htdemucs_ft "bag of models" — four specialists, one per source.
+ * The files are listed in {@link SOURCES} order (drums, bass, other, vocals) so
+ * the separator can take each specialist's own target stem.
+ */
 const REGISTRY: Record<ModelQuality, ModelSpec> = {
-  // Filled in by issue #8.
-  balanced: { files: [] },
-  best: { files: [] },
+  // Single-file 4-stem htdemucs, full fp32 weights (~316 MB).
+  balanced: {
+    files: [
+      {
+        filename: "htdemucs.onnx",
+        sha256:
+          "68d0bf16428ef66e692cdff8a9ccf28f1ef3f69440d57e58605a4cc55fcc5e74",
+        size: 316_446_953,
+        url: `${HF_SINGLE_BASE}/htdemucs.onnx`,
+      },
+    ],
+  },
+  best: {
+    files: [
+      {
+        filename: "htdemucs_ft_drums.onnx",
+        sha256:
+          "f76b68af36066e38885b369299b5032a861038f9b49da5aa6cf1c31cfa69cf27",
+        size: 316_446_953,
+        url: `${HF_FT_BASE}/htdemucs_ft_drums.onnx`,
+      },
+      {
+        filename: "htdemucs_ft_bass.onnx",
+        sha256:
+          "2a74d9283fc2336fcc58d50f87a7080aff57aea372f65cfe3f0211ea1ff16182",
+        size: 316_446_953,
+        url: `${HF_FT_BASE}/htdemucs_ft_bass.onnx`,
+      },
+      {
+        filename: "htdemucs_ft_other.onnx",
+        sha256:
+          "90e11806c1bb558ca9d9c7e909d28a2854f7f217982e90482dbed6442513daad",
+        size: 316_446_953,
+        url: `${HF_FT_BASE}/htdemucs_ft_other.onnx`,
+      },
+      {
+        filename: "htdemucs_ft_vocals.onnx",
+        sha256:
+          "8c5d5e2da1f27050240bb80236673307ee3b40d4b064066d9350f4d64bfd544d",
+        size: 316_446_953,
+        url: `${HF_FT_BASE}/htdemucs_ft_vocals.onnx`,
+      },
+    ],
+  },
   // Single-file 4-stem htdemucs, fp16-stored weights (same runtime as fp32).
   fast: {
     files: [
@@ -43,7 +91,7 @@ const REGISTRY: Record<ModelQuality, ModelSpec> = {
         sha256:
           "d05c269d0178d2a72ad484b10b11dd370193fc923201c3b27a99f848745db70a",
         size: 165_612_636,
-        url: `${HF_FAST_BASE}/htdemucs_fp16weights.onnx`,
+        url: `${HF_SINGLE_BASE}/htdemucs_fp16weights.onnx`,
       },
     ],
   },
@@ -87,14 +135,15 @@ async function isComplete(dest: string, file: ModelFile): Promise<boolean> {
 async function downloadFile(
   file: ModelFile,
   dest: string,
-  onProgress?: (fraction: number) => void
+  onProgress?: (fraction: number) => void,
+  signal?: AbortSignal
 ): Promise<void> {
   const partial = `${dest}.download`;
   const existing = (await fileExists(partial)) ? (await stat(partial)).size : 0;
-  const res = await fetch(
-    file.url,
-    existing > 0 ? { headers: { Range: `bytes=${existing}-` } } : {}
-  );
+  const res = await fetch(file.url, {
+    ...(existing > 0 ? { headers: { Range: `bytes=${existing}-` } } : {}),
+    signal,
+  });
   if (!(res.ok && res.body)) {
     throw new Error(`Failed to download model (HTTP ${res.status}).`);
   }
@@ -121,16 +170,23 @@ async function downloadFile(
   await rename(partial, dest);
 }
 
+/** Total download size (bytes) for a quality — surfaced in the settings UI. */
+export function modelDownloadBytes(quality: ModelQuality): number {
+  return REGISTRY[quality].files.reduce((sum, file) => sum + file.size, 0);
+}
+
 /**
  * Ensure every file for `quality` is present and verified, downloading (with
  * resume) whatever is missing. `onProgress` receives an aggregate 0..1
- * fraction across all files. Returns the path to the primary `.onnx` model.
+ * fraction across all files. Returns the paths to every `.onnx` file in
+ * registry order — one for single-model qualities, four for the `best` bag.
  */
 export async function ensureModel(
   dataDir: string,
   quality: ModelQuality,
-  onProgress?: (fraction: number) => void
-): Promise<string> {
+  onProgress?: (fraction: number) => void,
+  signal?: AbortSignal
+): Promise<string[]> {
   const spec = REGISTRY[quality];
   if (spec.files.length === 0) {
     throw new Error(`The "${quality}" model is not available yet.`);
@@ -141,19 +197,45 @@ export async function ensureModel(
 
   const totalBytes = spec.files.reduce((sum, file) => sum + file.size, 0);
   let completedBytes = 0;
+  const paths: string[] = [];
   for (const file of spec.files) {
     const dest = join(dir, file.filename);
+    paths.push(dest);
     // biome-ignore lint/performance/noAwaitInLoops: files download sequentially
     if (await isComplete(dest, file)) {
       completedBytes += file.size;
       onProgress?.(completedBytes / totalBytes);
       continue;
     }
-    await downloadFile(file, dest, (fraction) => {
-      onProgress?.((completedBytes + fraction * file.size) / totalBytes);
-    });
+    await downloadFile(
+      file,
+      dest,
+      (fraction) => {
+        onProgress?.((completedBytes + fraction * file.size) / totalBytes);
+      },
+      signal
+    );
     completedBytes += file.size;
   }
 
-  return join(dir, spec.files[0].filename);
+  return paths;
+}
+
+/** Whether every file for `quality` is already downloaded and complete. */
+export async function isModelReady(
+  dataDir: string,
+  quality: ModelQuality
+): Promise<boolean> {
+  const spec = REGISTRY[quality];
+  if (spec.files.length === 0) {
+    return false;
+  }
+  const dir = modelDir(dataDir, quality);
+  for (const file of spec.files) {
+    // biome-ignore lint/performance/noAwaitInLoops: cheap sequential stat checks
+    if (!(await isComplete(join(dir, file.filename), file))) {
+      return false;
+    }
+  }
+  return true;
 }

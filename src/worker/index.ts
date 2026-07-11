@@ -179,7 +179,7 @@ async function runSeparate(config: SeparateJobConfig): Promise<void> {
   const buffer = await readFile(config.mixPath);
   const { channels } = decodeWav(toArrayBuffer(buffer));
 
-  const stems = await separateMix(channels, config.modelPath, (fraction) =>
+  const stems = await separateMix(channels, config.modelPaths, (fraction) =>
     reportProgress(config.songId, "separating", fraction * 100)
   );
 

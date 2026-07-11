@@ -16,9 +16,28 @@ import {
   SONGS_PATH_SEGMENT,
 } from "../shared/asset";
 import { IpcChannel } from "../shared/ipc";
-import type { AppInfo, JobProgress, Settings, Song } from "../shared/types";
+import {
+  type AppInfo,
+  type JobProgress,
+  MODEL_QUALITIES,
+  type ModelQuality,
+  type ModelStatus,
+  type Settings,
+  type Song,
+} from "../shared/types";
 import { isMigrating, setMigrating } from "./migration-state";
-import { enqueue, initQueue, recoverAndResume, retrySong } from "./queue";
+import {
+  ensureModel,
+  isModelReady,
+  modelDownloadBytes,
+} from "./provision/models";
+import {
+  enqueue,
+  initQueue,
+  recoverAndResume,
+  retrySong,
+  updateQueueConfig,
+} from "./queue";
 import { getSettings, setSettings } from "./settings";
 import {
   addSong,
@@ -29,6 +48,7 @@ import { migrateDataDir, validateDestination } from "./store/move-data";
 import { resolveYouTubeMeta, watchUrl } from "./youtube";
 
 let mainWindow: BrowserWindow | null = null;
+let modelDownloadAbort: AbortController | null = null;
 
 function broadcast(channel: string, payload: Song | JobProgress): void {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -145,11 +165,65 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannel.GetSettings, () => getSettings());
 
-  ipcMain.handle(IpcChannel.SetSettings, (_event, patch: Partial<Settings>) =>
-    setSettings(patch)
+  ipcMain.handle(
+    IpcChannel.SetSettings,
+    async (_event, patch: Partial<Settings>) => {
+      const next = await setSettings(patch);
+      updateQueueConfig({
+        dataDir: next.dataDir,
+        modelQuality: next.modelQuality,
+      });
+      return next;
+    }
   );
 
   ipcMain.handle(IpcChannel.IsMigrating, () => isMigrating());
+
+  ipcMain.handle(
+    IpcChannel.GetModelStatuses,
+    async (): Promise<ModelStatus[]> => {
+      const { dataDir } = await getSettings();
+      return Promise.all(
+        MODEL_QUALITIES.map(async (quality) => ({
+          bytes: modelDownloadBytes(quality),
+          quality,
+          ready: await isModelReady(dataDir, quality),
+        }))
+      );
+    }
+  );
+
+  ipcMain.handle(
+    IpcChannel.DownloadModel,
+    async (event, quality: ModelQuality) => {
+      const { dataDir } = await getSettings();
+      modelDownloadAbort = new AbortController();
+      try {
+        await ensureModel(
+          dataDir,
+          quality,
+          (fraction) => {
+            if (!event.sender.isDestroyed()) {
+              event.sender.send(IpcChannel.ModelDownloadProgress, {
+                pct: fraction * 100,
+                quality,
+              });
+            }
+          },
+          modelDownloadAbort.signal
+        );
+      } finally {
+        modelDownloadAbort = null;
+      }
+      const next = await setSettings({ modelQuality: quality });
+      updateQueueConfig({ modelQuality: next.modelQuality });
+      return next;
+    }
+  );
+
+  ipcMain.handle(IpcChannel.CancelModelDownload, () => {
+    modelDownloadAbort?.abort();
+  });
 
   ipcMain.handle(IpcChannel.ResolveYouTubeMeta, (_event, url: string) =>
     resolveYouTubeMeta(url)
@@ -225,7 +299,9 @@ function registerIpcHandlers(): void {
     } finally {
       setMigrating(false);
     }
-    return getSettings();
+    const next = await getSettings();
+    updateQueueConfig({ dataDir: next.dataDir });
+    return next;
   });
 }
 

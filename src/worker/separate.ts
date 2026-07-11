@@ -57,13 +57,9 @@ function toStereo(channels: Float32Array[]): Float32Array[] {
   return channels.slice(0, N_CHANNELS);
 }
 
-/**
- * Separate `channels` (planar, 44.1 kHz) into stems. `onProgress` receives a
- * 0..1 fraction as segments complete. Returns `stems[i][channel]` where `i`
- * indexes {@link SOURCES}.
- */
-export async function separateMix(
-  channels: Float32Array[],
+/** Run a single htdemucs model over the mix, returning all four stems. */
+async function runModel(
+  mix: Float32Array[],
   modelPath: string,
   onProgress?: (fraction: number) => void
 ): Promise<Float32Array[][]> {
@@ -71,7 +67,6 @@ export async function separateMix(
   try {
     const inputName = pickTensorName(session.inputNames, INPUT_NAME);
     const outputName = pickTensorName(session.outputNames, OUTPUT_NAME);
-    const mix = toStereo(channels);
     const window = makeTransitionWindow(N_SAMPLES);
 
     const runSegment = async (
@@ -98,6 +93,37 @@ export async function separateMix(
   } finally {
     await session.release();
   }
+}
+
+/**
+ * Separate `channels` (planar, 44.1 kHz) into stems. `onProgress` receives a
+ * 0..1 fraction as work completes. Returns `stems[i][channel]` where `i`
+ * indexes {@link SOURCES}.
+ *
+ * A single `modelPath` runs one model and returns its four stems. The `best`
+ * quality passes four fine-tuned specialists (in {@link SOURCES} order); each
+ * is run and contributes only its own target stem — the htdemucs_ft "bag".
+ */
+export async function separateMix(
+  channels: Float32Array[],
+  modelPaths: string[],
+  onProgress?: (fraction: number) => void
+): Promise<Float32Array[][]> {
+  const mix = toStereo(channels);
+
+  if (modelPaths.length === 1) {
+    return await runModel(mix, modelPaths[0], onProgress);
+  }
+
+  const stems: Float32Array[][] = new Array(SOURCES.length);
+  for (let i = 0; i < modelPaths.length; i += 1) {
+    // biome-ignore lint/performance/noAwaitInLoops: specialists run sequentially to cap memory
+    const modelStems = await runModel(mix, modelPaths[i], (fraction) =>
+      onProgress?.((i + fraction) / modelPaths.length)
+    );
+    stems[i] = modelStems[i];
+  }
+  return stems;
 }
 
 /** Sum several planar stems sample-wise into one planar stem. */

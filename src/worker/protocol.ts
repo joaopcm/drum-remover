@@ -33,8 +33,11 @@ export interface SeparateJobConfig {
   kind: "separate";
   /** Source WAV to read: `<dataDir>/songs/<id>/mix.wav`. */
   mixPath: string;
-  /** Provisioned ONNX model file to run. */
-  modelPath: string;
+  /**
+   * Provisioned ONNX model files to run, in drums/bass/other/vocals order. One
+   * entry for single-model qualities; four specialists for the `best` bag.
+   */
+  modelPaths: string[];
   /** Original download to delete on success. */
   originalPath: string;
   /** Destination: `<dataDir>/songs/<id>/peaks.json`. */
