@@ -2,10 +2,14 @@ import { AddSongDialog } from "@renderer/components/add-song-dialog";
 import { SongRow } from "@renderer/components/song-row";
 import { Button } from "@renderer/components/ui/button";
 import type { AppInfo, Song } from "@shared/types";
-import { AudioWaveform, Plus } from "lucide-react";
+import { AudioWaveform, Plus, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export function Library(): React.JSX.Element {
+interface LibraryProps {
+  onOpenSettings?: () => void;
+}
+
+export function Library({ onOpenSettings }: LibraryProps): React.JSX.Element {
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const [addOpen, setAddOpen] = useState(false);
@@ -54,10 +58,27 @@ export function Library(): React.JSX.Element {
             Socrash
           </span>
         </div>
-        <Button className="no-drag" onClick={() => setAddOpen(true)} size="sm">
-          <Plus className="size-4" />
-          Add song
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            className="no-drag"
+            onClick={() => setAddOpen(true)}
+            size="sm"
+          >
+            <Plus className="size-4" />
+            Add song
+          </Button>
+          {onOpenSettings ? (
+            <Button
+              aria-label="Settings"
+              className="no-drag"
+              onClick={onOpenSettings}
+              size="icon"
+              variant="ghost"
+            >
+              <SettingsIcon className="size-4" />
+            </Button>
+          ) : null}
+        </div>
       </header>
 
       <main className="flex-1 overflow-y-auto">
