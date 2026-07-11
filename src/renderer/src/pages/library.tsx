@@ -1,6 +1,8 @@
+import { useAppView } from "@renderer/app-view";
 import { AddSongDialog } from "@renderer/components/add-song-dialog";
 import { SongRow } from "@renderer/components/song-row";
 import { Button } from "@renderer/components/ui/button";
+import { cn } from "@renderer/lib/utils";
 import type { AppInfo, JobProgress, Song } from "@shared/types";
 import { AudioWaveform, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -9,6 +11,8 @@ import { useEffect, useState } from "react";
 const TERMINAL_STATUSES = new Set<Song["status"]>(["ready", "error", "queued"]);
 
 export function Library(): React.JSX.Element {
+  const { activeSongId, minimized } = useAppView();
+  const miniBarPresent = minimized && activeSongId !== null;
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const [progress, setProgress] = useState<Record<string, JobProgress>>({});
@@ -112,7 +116,12 @@ export function Library(): React.JSX.Element {
             </div>
           </div>
         ) : (
-          <div className="mx-auto flex max-w-3xl flex-col gap-2 p-6">
+          <div
+            className={cn(
+              "mx-auto flex max-w-3xl flex-col gap-2 p-6",
+              miniBarPresent && "pb-28"
+            )}
+          >
             {songs.map((song) => (
               <SongRow
                 key={song.id}

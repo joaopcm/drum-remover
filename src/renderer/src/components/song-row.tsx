@@ -1,3 +1,4 @@
+import { useAppView } from "@renderer/app-view";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -16,7 +17,14 @@ import {
 import { formatDuration } from "@renderer/lib/format";
 import { stageLabel, statusMeta } from "@renderer/lib/song-status";
 import type { JobProgress, Song } from "@shared/types";
-import { Loader2, MoreVertical, Music, RotateCw, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  MoreVertical,
+  Music,
+  Play,
+  RotateCw,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 
 interface SongRowProps {
@@ -26,6 +34,7 @@ interface SongRowProps {
 }
 
 export function SongRow({ song, onRemoved, progress }: SongRowProps) {
+  const { openPlayer } = useAppView();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const status = statusMeta(song.status);
@@ -91,6 +100,17 @@ export function SongRow({ song, onRemoved, progress }: SongRowProps) {
       )}
 
       <Badge tone={status.tone}>{badgeLabel}</Badge>
+
+      {song.status === "ready" ? (
+        <Button
+          aria-label="Open player"
+          onClick={() => openPlayer(song.id)}
+          size="icon"
+          variant="ghost"
+        >
+          <Play className="size-4" />
+        </Button>
+      ) : null}
 
       <DropdownMenu>
         <DropdownMenuTrigger
