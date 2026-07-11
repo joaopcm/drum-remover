@@ -17,6 +17,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
+    "make-fixtures": "node scripts/make-fixtures.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "postinstall": "electron-builder install-app-deps"

@@ -59,6 +59,21 @@ export interface YouTubeMeta {
   videoId: string;
 }
 
+/**
+ * Precomputed waveform peaks for a separated song, consumed by the player to
+ * render its two lanes without decoding the full audio up front. Issue #4
+ * produces this as `peaks.json`; the player reads it (or synthesizes it from a
+ * fixture). Each array holds normalized 0..1 peak magnitudes per bucket, with
+ * roughly ~2000 buckets spanning a full song.
+ */
+export interface PeaksData {
+  drums: number[];
+  rest: number[];
+  sampleRate: number;
+  samplesPerBucket: number;
+  version: 1;
+}
+
 /** Runtime information about the app, surfaced for diagnostics. */
 export interface AppInfo {
   chrome: string;

@@ -1,6 +1,12 @@
-import { join } from "node:path";
+import { join, normalize, sep } from "node:path";
+import { pathToFileURL } from "node:url";
 import { electronApp, is, optimizer } from "@electron-toolkit/utils";
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, ipcMain, net, protocol, shell } from "electron";
+import {
+  APP_ASSET_HOST,
+  APP_PROTOCOL,
+  SONGS_PATH_SEGMENT,
+} from "../shared/asset";
 import { IpcChannel } from "../shared/ipc";
 import type { AppInfo } from "../shared/types";
 import { getDefaultSettings } from "./settings";
@@ -10,6 +16,56 @@ import {
   removeSong as removeSongFromStore,
 } from "./store/library";
 import { resolveYouTubeMeta, watchUrl } from "./youtube";
+
+/**
+ * `app://` must be registered as privileged before the app is ready so it can
+ * be fetched from the renderer under the CSP and stream media/range requests.
+ */
+protocol.registerSchemesAsPrivileged([
+  {
+    privileges: {
+      secure: true,
+      standard: true,
+      stream: true,
+      supportFetchAPI: true,
+    },
+    scheme: APP_PROTOCOL,
+  },
+]);
+
+const LEADING_SLASHES = /^\/+/;
+
+/**
+ * Serve a song's on-disk files (stems + peaks) to the renderer. Requests look
+ * like `app://local/songs/<id>/drums.wav` and map to `<dataDir>/songs/…`. Paths
+ * are constrained to the songs directory to prevent traversal, and missing
+ * files return 404 so the renderer can fall back to fixtures.
+ */
+function registerAppProtocol(): void {
+  const { dataDir } = getDefaultSettings();
+  const songsRoot = normalize(join(dataDir, SONGS_PATH_SEGMENT));
+
+  protocol.handle(APP_PROTOCOL, async (request) => {
+    const notFound = new Response("Not found", { status: 404 });
+    try {
+      const { host, pathname } = new URL(request.url);
+      if (host !== APP_ASSET_HOST) {
+        return notFound;
+      }
+      const relative = decodeURIComponent(pathname).replace(
+        LEADING_SLASHES,
+        ""
+      );
+      const resolved = normalize(join(dataDir, relative));
+      if (resolved !== songsRoot && !resolved.startsWith(songsRoot + sep)) {
+        return new Response("Forbidden", { status: 403 });
+      }
+      return await net.fetch(pathToFileURL(resolved).toString());
+    } catch {
+      return notFound;
+    }
+  });
+}
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -89,6 +145,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
+  registerAppProtocol();
   registerIpcHandlers();
   createWindow();
 
