@@ -45,3 +45,16 @@ body {
 .no-drag {
   -webkit-app-region: no-drag;
 }
+
+/* Global safety net: honor reduced-motion everywhere, on top of the
+   per-component treatments. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -12,6 +12,7 @@ files:
 asarUnpack:
   - resources/**
   - node_modules/onnxruntime-node/bin/**
+  - node_modules/ffmpeg-static/**
 win:
   executableName: socrash
 nsis:

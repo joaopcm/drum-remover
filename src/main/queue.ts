@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 import { utilityProcess } from "electron";
 import ffmpegStatic from "ffmpeg-static";
 import type { JobProgress, ModelQuality, Song } from "../shared/types";
@@ -120,10 +120,16 @@ async function processDownload(d: QueueDeps, song: Song): Promise<void> {
     if (!ffmpegStatic) {
       throw new Error("Bundled ffmpeg binary is missing.");
     }
+    // In a packaged build the binary is unpacked next to the asar; the path
+    // baked in by ffmpeg-static still points inside app.asar (a no-op in dev).
+    const ffmpegPath = ffmpegStatic.replace(
+      `app.asar${sep}`,
+      `app.asar.unpacked${sep}`
+    );
     const dir = songDir(d.dataDir, song.id);
     const result = await runWorker(
       {
-        ffmpegPath: ffmpegStatic,
+        ffmpegPath,
         kind: "download",
         mixPath: join(dir, "mix.wav"),
         originalPath: join(dir, "original.m4a"),
