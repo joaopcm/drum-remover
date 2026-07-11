@@ -1,0 +1,58 @@
+name: Release macOS
+
+on:
+  push:
+    branches: [main]
+
+# Needed to create GitHub Releases and upload the built DMG.
+permissions:
+  contents: write
+
+concurrency:
+  group: release-macos
+  cancel-in-progress: false
+
+jobs:
+  build-mac:
+    name: Build & publish macOS app
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Full install (runs postinstall electron-builder install-app-deps) so the
+      # native binaries (onnxruntime-node, ffmpeg-static) are set up for Electron.
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build macOS DMG
+        run: pnpm build:mac
+        env:
+          # No signing certificate in CI — build an unsigned app rather than
+          # failing while trying to auto-discover one.
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Read app version
+        id: meta
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.meta.outputs.version }}-build.${{ github.run_number }}
+          name: Socrash v${{ steps.meta.outputs.version }} (build ${{ github.run_number }})
+          body: |
+            Automated macOS build from `main` (${{ github.sha }}).
+
+            **Download the `.dmg` below** to install on Apple Silicon Macs.
+            The build is unsigned, so on first launch right-click the app and
+            choose **Open** (or allow it in System Settings → Privacy & Security).
+          files: dist/*.dmg
+          fail_on_unmatched_files: true
