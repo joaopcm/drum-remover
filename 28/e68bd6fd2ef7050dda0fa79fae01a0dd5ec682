@@ -1,0 +1,19 @@
+src/renderer/src/player/mini-player.tsx
+  s_5bc161f2709cc6::t_86bf0d77181c01 107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "28e68bd6fd2ef7050dda0fa79fae01a0dd5ec682",
+  "prompts": {},
+  "sessions": {
+    "s_5bc161f2709cc6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0cd2fd38-7cd9-44b4-bd13-9a74aaca1ca8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
