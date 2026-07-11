@@ -1,6 +1,8 @@
 import type {
   AppInfo,
+  DataDirValidation,
   JobProgress,
+  MigrationProgress,
   Settings,
   Song,
   YouTubeMeta,
@@ -12,17 +14,23 @@ import type {
  */
 export const IpcChannel = {
   AddSong: "songs:add",
+  ChooseDataDir: "settings:choose-data-dir",
   GetAppInfo: "app:get-info",
   GetSettings: "settings:get",
+  IsMigrating: "settings:is-migrating",
   /** main→renderer push: fine-grained job progress ({songId, stage, pct}). */
   JobProgress: "job:progress",
   ListSongs: "songs:list",
+  MigrationProgress: "settings:migration-progress",
+  MoveDataDir: "settings:move-data-dir",
   RemoveSong: "songs:remove",
   ResolveYouTubeMeta: "youtube:resolve-meta",
   /** Re-enqueue a failed song for processing. */
   RetrySong: "songs:retry",
+  SetSettings: "settings:set",
   /** main→renderer push: a song's persisted state changed. */
   SongUpdate: "song:update",
+  ValidateDataDir: "settings:validate-data-dir",
 } as const;
 
 export type IpcChannelName = (typeof IpcChannel)[keyof typeof IpcChannel];
@@ -34,14 +42,27 @@ export type IpcChannelName = (typeof IpcChannel)[keyof typeof IpcChannel];
 export interface SocrashApi {
   /** Add a song to the library in `queued` status. Rejects on invalid/duplicate URLs. */
   addSong: (ytUrl: string) => Promise<Song>;
+  /** Open a native folder picker for a new data directory. Resolves null if cancelled. */
+  chooseDataDir: () => Promise<string | null>;
   getAppInfo: () => Promise<AppInfo>;
   getSettings: () => Promise<Settings>;
+  /** Whether a data-directory migration is currently in progress. */
+  isMigrating: () => Promise<boolean>;
   listSongs: () => Promise<Song[]>;
+  /**
+   * Safely migrate all data to `dest` (copy → verify → flip pointer → delete
+   * old). Rejects if a move is already running or the destination is invalid.
+   */
+  moveDataDir: (dest: string) => Promise<Settings>;
   /**
    * Subscribe to fine-grained job progress pushed from main while a song is
    * processing. Returns an unsubscribe function.
    */
   onJobProgress: (cb: (progress: JobProgress) => void) => () => void;
+  /** Subscribe to migration progress. Returns an unsubscribe function. */
+  onMigrationProgress: (
+    callback: (progress: MigrationProgress) => void
+  ) => () => void;
   /**
    * Subscribe to song state changes pushed from main (status/duration/error).
    * Returns an unsubscribe function.
@@ -52,4 +73,8 @@ export interface SocrashApi {
   resolveYouTubeMeta: (url: string) => Promise<YouTubeMeta>;
   /** Re-enqueue a song that previously failed. */
   retrySong: (id: string) => Promise<void>;
+  /** Merge a partial patch into the persisted settings and return the result. */
+  setSettings: (patch: Partial<Settings>) => Promise<Settings>;
+  /** Check a candidate data directory before moving into it. */
+  validateDataDir: (dest: string) => Promise<DataDirValidation>;
 }

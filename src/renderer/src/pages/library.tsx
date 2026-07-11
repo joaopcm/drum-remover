@@ -4,14 +4,14 @@ import { SongRow } from "@renderer/components/song-row";
 import { Button } from "@renderer/components/ui/button";
 import { cn } from "@renderer/lib/utils";
 import type { AppInfo, JobProgress, Song } from "@shared/types";
-import { AudioWaveform, Plus } from "lucide-react";
+import { AudioWaveform, Plus, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 /** Stages that mean a job is no longer actively reporting progress. */
 const TERMINAL_STATUSES = new Set<Song["status"]>(["ready", "error", "queued"]);
 
 export function Library(): React.JSX.Element {
-  const { activeSongId, minimized } = useAppView();
+  const { activeSongId, minimized, openSettings } = useAppView();
   const miniBarPresent = minimized && activeSongId !== null;
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
@@ -89,10 +89,25 @@ export function Library(): React.JSX.Element {
             Socrash
           </span>
         </div>
-        <Button className="no-drag" onClick={() => setAddOpen(true)} size="sm">
-          <Plus className="size-4" />
-          Add song
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            className="no-drag"
+            onClick={() => setAddOpen(true)}
+            size="sm"
+          >
+            <Plus className="size-4" />
+            Add song
+          </Button>
+          <Button
+            aria-label="Settings"
+            className="no-drag"
+            onClick={openSettings}
+            size="icon"
+            variant="ghost"
+          >
+            <SettingsIcon className="size-4" />
+          </Button>
+        </div>
       </header>
 
       <main className="flex-1 overflow-y-auto">

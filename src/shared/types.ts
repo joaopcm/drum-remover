@@ -65,6 +65,24 @@ export interface PeaksData {
   version: 1;
 }
 
+/** Progress emitted while the data directory is migrated to a new location. */
+export interface MigrationProgress {
+  bytesCopied: number;
+  totalBytes: number;
+}
+
+/**
+ * Result of checking a candidate data directory before a move.
+ * `ok` is false for hard failures (same dir, nested inside the current dir,
+ * unwritable). `nonEmpty` flags destinations that already hold files and thus
+ * need explicit user confirmation. `message` explains a hard failure.
+ */
+export interface DataDirValidation {
+  message: string | null;
+  nonEmpty: boolean;
+  ok: boolean;
+}
+
 /** Metadata resolved from a YouTube URL for the add-song preview. */
 export interface YouTubeMeta {
   author: string | null;

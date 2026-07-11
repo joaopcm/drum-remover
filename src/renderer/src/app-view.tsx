@@ -6,15 +6,17 @@ import {
   useState,
 } from "react";
 
-/** Top-level views. Issue #7 (settings) extends this further. */
-export type AppView = "library" | "player";
+/** Top-level views. */
+export type AppView = "library" | "player" | "settings";
 
 interface AppViewState {
   activeSongId: string | null;
   closePlayer: () => void;
+  closeSettings: () => void;
   minimized: boolean;
   minimizePlayer: () => void;
   openPlayer: (songId: string) => void;
+  openSettings: () => void;
   restorePlayer: () => void;
   view: AppView;
 }
@@ -58,22 +60,34 @@ export function AppViewProvider({
     setView("player");
   }, []);
 
+  const openSettings = useCallback(() => {
+    setView("settings");
+  }, []);
+
+  const closeSettings = useCallback(() => {
+    setView("library");
+  }, []);
+
   const value = useMemo<AppViewState>(
     () => ({
       activeSongId,
       closePlayer,
+      closeSettings,
       minimized,
       minimizePlayer,
       openPlayer,
+      openSettings,
       restorePlayer,
       view,
     }),
     [
       activeSongId,
       closePlayer,
+      closeSettings,
       minimized,
       minimizePlayer,
       openPlayer,
+      openSettings,
       restorePlayer,
       view,
     ]
