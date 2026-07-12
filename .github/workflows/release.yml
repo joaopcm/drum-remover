@@ -51,8 +51,14 @@ jobs:
           body: |
             Automated macOS build from `main` (${{ github.sha }}).
 
-            **Download the `.dmg` below** to install on Apple Silicon Macs.
-            The build is unsigned, so on first launch right-click the app and
-            choose **Open** (or allow it in System Settings → Privacy & Security).
+            **Download the `.dmg` below** and drag Socrash to Applications
+            (Apple Silicon). The app is ad-hoc signed but not notarized, so
+            macOS still quarantines downloads. On first launch, **right-click
+            the app → Open**.
+
+            If macOS still refuses to open it, clear the download quarantine:
+            ```bash
+            xattr -cr /Applications/Socrash.app
+            ```
           files: dist/*.dmg
           fail_on_unmatched_files: true
