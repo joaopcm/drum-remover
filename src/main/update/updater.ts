@@ -1,12 +1,13 @@
 import { spawn } from "node:child_process";
 import { createWriteStream, writeFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import { basename, join } from "node:path";
+import { join } from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { app } from "electron";
 import type { UpdateInfo } from "../../shared/types";
 import { BUILD_TAG } from "../build-info";
+import { buildInstallScript, resolveAppBundlePath } from "./install-script";
 import {
   compareBuildTags,
   type GitHubReleaseAsset,
@@ -101,46 +102,6 @@ export async function downloadUpdate(
   await pipeline(source, createWriteStream(dest));
 
   return dest;
-}
-
-const APP_BUNDLE_PATTERN = /^(.*\.app)\//;
-
-/** Finds the `.app` bundle root containing the running executable. */
-function resolveAppBundlePath(execPath: string): string | null {
-  const match = APP_BUNDLE_PATTERN.exec(execPath);
-  return match ? match[1] : null;
-}
-
-/**
- * Builds the detached shell script that performs the actual install once
- * the app quits. Kept as a pure string builder (no filesystem/process
- * access) so it's unit-testable without an Electron runtime.
- *
- * Waits for `pid` to exit, extracts the zip, strips the download quarantine
- * flag (required since the app is unnotarized — otherwise Gatekeeper blocks
- * the relaunch), swaps the bundle at `appPath` in place, then reopens it.
- */
-export function buildInstallScript(
-  pid: number,
-  zipPath: string,
-  appPath: string
-): string {
-  const extractDir = `${zipPath}.extracted`;
-  const appName = basename(appPath);
-  return `#!/bin/bash
-set -e
-while kill -0 ${pid} 2>/dev/null; do
-  sleep 0.2
-done
-rm -rf "${extractDir}"
-mkdir -p "${extractDir}"
-ditto -xk "${zipPath}" "${extractDir}"
-xattr -cr "${extractDir}/${appName}"
-rm -rf "${appPath}"
-ditto "${extractDir}/${appName}" "${appPath}"
-rm -rf "${extractDir}" "${zipPath}"
-open "${appPath}"
-`;
 }
 
 /**
