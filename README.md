@@ -7,6 +7,23 @@ and backing-track volume so you can practice along.
 
 No account. No server. Your audio never leaves your computer.
 
+## Install
+
+Download the latest `.dmg` from
+[Releases](https://github.com/joaopcm/socrash/releases) and drag **Socrash** to
+your Applications folder (Apple Silicon).
+
+The app is ad-hoc signed but not notarized (no paid Apple Developer account), so
+macOS quarantines the download and blocks the first launch. Clear the quarantine
+once, then open it normally:
+
+```bash
+xattr -cr /Applications/Socrash.app
+```
+
+(Alternatively: double-click Socrash, let macOS block it, then go to **System
+Settings → Privacy & Security** and click **Open Anyway**.)
+
 ## How it works
 
 1. **Add a song** — paste a YouTube URL; Socrash shows the thumbnail + title and
