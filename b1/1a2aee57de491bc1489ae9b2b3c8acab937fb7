@@ -1,0 +1,21 @@
+package.json
+  s_9e47cb40135c79::t_692b253c79305a 7
+src/main/update/updater.ts
+  s_9e47cb40135c79::t_6804b5d342aee1 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "b11a2aee57de491bc1489ae9b2b3c8acab937fb7",
+  "prompts": {},
+  "sessions": {
+    "s_9e47cb40135c79": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "2c67be75-224d-4e90-ad17-33d0f07d8415",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
