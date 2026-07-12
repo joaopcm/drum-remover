@@ -1,0 +1,24 @@
+scripts/adhoc-sign.cjs
+  s_5bc161f2709cc6::t_cf14bdaf7a7259 1-23
+electron-builder.yml
+  s_5bc161f2709cc6::t_3870228ddda21d 9-10
+  s_5bc161f2709cc6::t_6d365e1efd27c5 3
+.github/workflows/release.yml
+  s_5bc161f2709cc6::t_21f851f24bd726 54-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "86952d399a71b936afd4b268fb140a01b92940f3",
+  "prompts": {},
+  "sessions": {
+    "s_5bc161f2709cc6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0cd2fd38-7cd9-44b4-bd13-9a74aaca1ca8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
