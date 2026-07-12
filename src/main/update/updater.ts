@@ -26,7 +26,7 @@ import {
 const GITHUB_OWNER = "joaopcm";
 // See package.json "homepage"; kept as a constant rather than parsed at
 // runtime since it never changes independently of a code change.
-const GITHUB_REPO = "drum-remover";
+const GITHUB_REPO = "socrash";
 const GITHUB_LATEST_RELEASE_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`;
 
 interface GitHubRelease {
