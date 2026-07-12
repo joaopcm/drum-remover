@@ -10,6 +10,7 @@ import {
   protocol,
   shell,
 } from "electron";
+import appIcon from "../../resources/icon.png?asset";
 import {
   APP_ASSET_HOST,
   APP_PROTOCOL,
@@ -318,6 +319,12 @@ function registerIpcHandlers(): void {
 
 app.whenReady().then(async () => {
   electronApp.setAppUserModelId("com.socrash.app");
+
+  // Show the Socrash mark in the dock (packaged builds use build/icon.icns;
+  // this covers `pnpm dev` where the default Electron icon would show).
+  if (process.platform === "darwin") {
+    app.dock?.setIcon(appIcon);
+  }
 
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);
