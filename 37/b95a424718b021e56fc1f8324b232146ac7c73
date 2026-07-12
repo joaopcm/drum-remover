@@ -1,0 +1,26 @@
+src/main/update/install-script.test.ts
+  s_9e47cb40135c79::t_6b6857809097e8 2,26-29,31-37
+  s_9e47cb40135c79::t_2f72236c2196c2 30
+scripts/adhoc-sign.cjs
+  s_9e47cb40135c79::t_91d65cbb676636 1-2
+src/main/update/updater.ts
+  s_9e47cb40135c79::t_ed791ea77e551c 4,10
+src/main/update/install-script.ts
+  s_9e47cb40135c79::t_fb9c7964c998e9 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "37b95a424718b021e56fc1f8324b232146ac7c73",
+  "prompts": {},
+  "sessions": {
+    "s_9e47cb40135c79": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "2c67be75-224d-4e90-ad17-33d0f07d8415",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
