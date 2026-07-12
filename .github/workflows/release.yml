@@ -32,21 +32,26 @@ jobs:
       # native binaries (onnxruntime-node, ffmpeg-static) are set up for Electron.
       - run: pnpm install --frozen-lockfile
 
+      - name: Read app version
+        id: meta
+        run: |
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          echo "tag=v$(node -p "require('./package.json').version")-build.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
       - name: Build macOS DMG
         run: pnpm build:mac
         env:
           # No signing certificate in CI — build an unsigned app rather than
           # failing while trying to auto-discover one.
           CSC_IDENTITY_AUTO_DISCOVERY: false
-
-      - name: Read app version
-        id: meta
-        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          # Baked into the app so the in-app updater (src/main/update) can
+          # detect when a newer release is published.
+          SOCRASH_BUILD_TAG: ${{ steps.meta.outputs.tag }}
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.meta.outputs.version }}-build.${{ github.run_number }}
+          tag_name: ${{ steps.meta.outputs.tag }}
           name: Socrash v${{ steps.meta.outputs.version }} (build ${{ github.run_number }})
           body: |
             Automated macOS build from `main` (${{ github.sha }}).
@@ -60,5 +65,10 @@ jobs:
             ```bash
             xattr -cr /Applications/Socrash.app
             ```
-          files: dist/*.dmg
+
+            Already have Socrash installed? It will offer this build as an
+            in-app update automatically.
+          files: |
+            dist/*.dmg
+            dist/*.zip
           fail_on_unmatched_files: true

@@ -8,6 +8,8 @@ import type {
   ModelStatus,
   Settings,
   Song,
+  UpdateDownloadProgress,
+  UpdateInfo,
   YouTubeMeta,
 } from "./types";
 
@@ -18,6 +20,10 @@ import type {
 export const IpcChannel = {
   AddSong: "songs:add",
   CancelModelDownload: "models:cancel",
+  /** Abort an in-flight update download started by `startUpdate`. */
+  CancelUpdate: "update:cancel",
+  /** Check GitHub for a newer release right now; resolves the result. */
+  CheckForUpdate: "update:check",
   ChooseDataDir: "settings:choose-data-dir",
   DownloadModel: "models:download",
   GetAppInfo: "app:get-info",
@@ -38,6 +44,12 @@ export const IpcChannel = {
   SetSettings: "settings:set",
   /** main→renderer push: a song's persisted state changed. */
   SongUpdate: "song:update",
+  /** Download the update found by `checkForUpdate` and relaunch into it. */
+  StartUpdate: "update:start",
+  /** main→renderer push: a newer release was found (periodic background check). */
+  UpdateAvailable: "update:available",
+  /** main→renderer push: update download progress ({pct}). */
+  UpdateDownloadProgress: "update:download-progress",
   ValidateDataDir: "settings:validate-data-dir",
 } as const;
 
@@ -52,6 +64,10 @@ export interface SocrashApi {
   addSong: (ytUrl: string) => Promise<Song>;
   /** Cancel an in-flight model download started by `downloadModel`. */
   cancelModelDownload: () => Promise<void>;
+  /** Abort an in-flight update download started by `startUpdate`. */
+  cancelUpdate: () => Promise<void>;
+  /** Check GitHub for a release newer than this build. Resolves null if up to date. */
+  checkForUpdate: () => Promise<UpdateInfo | null>;
   /** Open a native folder picker for a new data directory. Resolves null if cancelled. */
   chooseDataDir: () => Promise<string | null>;
   /**
@@ -90,6 +106,15 @@ export interface SocrashApi {
    * Returns an unsubscribe function.
    */
   onSongUpdate: (cb: (song: Song) => void) => () => void;
+  /**
+   * Subscribe to newer releases found by the periodic background check.
+   * Returns an unsubscribe function.
+   */
+  onUpdateAvailable: (cb: (info: UpdateInfo) => void) => () => void;
+  /** Subscribe to update download progress. Returns an unsubscribe function. */
+  onUpdateDownloadProgress: (
+    cb: (progress: UpdateDownloadProgress) => void
+  ) => () => void;
   removeSong: (id: string) => Promise<void>;
   /** Resolve title + thumbnail for the add-song preview. Rejects on bad URLs. */
   resolveYouTubeMeta: (url: string) => Promise<YouTubeMeta>;
@@ -97,6 +122,12 @@ export interface SocrashApi {
   retrySong: (id: string) => Promise<void>;
   /** Merge a partial patch into the persisted settings and return the result. */
   setSettings: (patch: Partial<Settings>) => Promise<Settings>;
+  /**
+   * Download `info`'s update and relaunch into it once complete. The app
+   * quits itself as part of installing — callers don't need to handle the
+   * resolved promise, since a successful install never returns to the caller.
+   */
+  startUpdate: (info: UpdateInfo) => Promise<void>;
   /** Check a candidate data directory before moving into it. */
   validateDataDir: (dest: string) => Promise<DataDirValidation>;
 }
