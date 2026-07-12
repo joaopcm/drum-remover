@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { FIXTURE_ASSETS } from "./fixtures";
+import { buildClickTrack, detectBeats, toMonoFromBuffer } from "./metronome";
 import { clampTime, currentPosition } from "./time";
 
 /** Lifecycle of the currently loaded song. */
@@ -17,6 +18,7 @@ export type PlayerStatus = "idle" | "loading" | "ready" | "error";
 
 interface DecodedSong {
   drumBuffer: AudioBuffer;
+  metronomeBuffer: AudioBuffer;
   peaks: PeaksData;
   restBuffer: AudioBuffer;
 }
@@ -25,6 +27,7 @@ export interface PlayerState {
   currentSongId: string | null;
   drumVolume: number;
   durationSec: number;
+  metronomeVolume: number;
   peaks: PeaksData | null;
   playing: boolean;
   positionSec: number;
@@ -38,6 +41,7 @@ export interface PlayerControls {
   play: () => void;
   seek: (sec: number) => void;
   setDrumVolume: (value: number) => void;
+  setMetronomeVolume: (value: number) => void;
   setRestVolume: (value: number) => void;
   toggle: () => void;
 }
@@ -62,6 +66,24 @@ async function fetchJson<T>(url: string): Promise<T> {
   return (await response.json()) as T;
 }
 
+/**
+ * Synthesize the metronome track from the drums stem's beat times. Beat
+ * detection never throws (see `detectBeats`), so a song whose tempo can't be
+ * tracked simply gets a silent click track rather than failing to load.
+ */
+async function buildMetronomeTrack(
+  ctx: AudioContext,
+  drumBuffer: AudioBuffer,
+  restBuffer: AudioBuffer
+): Promise<AudioBuffer> {
+  const durationSec = Math.max(drumBuffer.duration, restBuffer.duration);
+  const beats = await detectBeats(
+    toMonoFromBuffer(drumBuffer),
+    drumBuffer.sampleRate
+  );
+  return buildClickTrack(ctx, beats, durationSec);
+}
+
 async function decodeFromUrls(
   ctx: AudioContext,
   drumsUrl: string,
@@ -77,7 +99,12 @@ async function decodeFromUrls(
     ctx.decodeAudioData(drumsData),
     ctx.decodeAudioData(restData),
   ]);
-  return { drumBuffer, peaks, restBuffer };
+  const metronomeBuffer = await buildMetronomeTrack(
+    ctx,
+    drumBuffer,
+    restBuffer
+  );
+  return { drumBuffer, metronomeBuffer, peaks, restBuffer };
 }
 
 /**
@@ -118,15 +145,21 @@ export function PlayerProvider({
   const [durationSec, setDurationSec] = useState(0);
   const [drumVolume, setDrumVolumeState] = useState(1);
   const [restVolume, setRestVolumeState] = useState(1);
+  // Off by default: existing songs get a metronome without changing how
+  // anything already in the library sounds until the user opts in.
+  const [metronomeVolume, setMetronomeVolumeState] = useState(0);
   const [peaks, setPeaks] = useState<PeaksData | null>(null);
 
   const ctxRef = useRef<AudioContext | null>(null);
   const drumGainRef = useRef<GainNode | null>(null);
   const restGainRef = useRef<GainNode | null>(null);
+  const metronomeGainRef = useRef<GainNode | null>(null);
   const drumBufferRef = useRef<AudioBuffer | null>(null);
   const restBufferRef = useRef<AudioBuffer | null>(null);
+  const metronomeBufferRef = useRef<AudioBuffer | null>(null);
   const drumSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const restSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const metronomeSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const startCtxTimeRef = useRef(0);
   const startOffsetRef = useRef(0);
   const pausedPositionRef = useRef(0);
@@ -141,19 +174,27 @@ export function PlayerProvider({
       ctx = new AudioContext();
       const drumGain = ctx.createGain();
       const restGain = ctx.createGain();
+      const metronomeGain = ctx.createGain();
       drumGain.gain.value = drumVolume;
       restGain.gain.value = restVolume;
+      metronomeGain.gain.value = metronomeVolume;
       drumGain.connect(ctx.destination);
       restGain.connect(ctx.destination);
+      metronomeGain.connect(ctx.destination);
       ctxRef.current = ctx;
       drumGainRef.current = drumGain;
       restGainRef.current = restGain;
+      metronomeGainRef.current = metronomeGain;
     }
     return ctx;
-  }, [drumVolume, restVolume]);
+  }, [drumVolume, restVolume, metronomeVolume]);
 
   const stopSources = useCallback(() => {
-    for (const source of [drumSourceRef.current, restSourceRef.current]) {
+    for (const source of [
+      drumSourceRef.current,
+      restSourceRef.current,
+      metronomeSourceRef.current,
+    ]) {
       if (source) {
         source.onended = null;
         try {
@@ -166,6 +207,7 @@ export function PlayerProvider({
     }
     drumSourceRef.current = null;
     restSourceRef.current = null;
+    metronomeSourceRef.current = null;
   }, []);
 
   const stopRaf = useCallback(() => {
@@ -213,12 +255,15 @@ export function PlayerProvider({
       const ctx = ensureContext();
       const drumBuffer = drumBufferRef.current;
       const restBuffer = restBufferRef.current;
+      const metronomeBuffer = metronomeBufferRef.current;
       if (
         !(
           drumBuffer &&
           restBuffer &&
+          metronomeBuffer &&
           drumGainRef.current &&
-          restGainRef.current
+          restGainRef.current &&
+          metronomeGainRef.current
         )
       ) {
         return;
@@ -231,14 +276,19 @@ export function PlayerProvider({
       const restSource = ctx.createBufferSource();
       restSource.buffer = restBuffer;
       restSource.connect(restGainRef.current);
+      const metronomeSource = ctx.createBufferSource();
+      metronomeSource.buffer = metronomeBuffer;
+      metronomeSource.connect(metronomeGainRef.current);
 
-      // Same clock reading for both keeps the stems phase-locked forever.
+      // Same clock reading for all three keeps them phase-locked forever.
       const when = ctx.currentTime;
       drumSource.start(when, offsetSec);
       restSource.start(when, offsetSec);
+      metronomeSource.start(when, offsetSec);
 
       drumSourceRef.current = drumSource;
       restSourceRef.current = restSource;
+      metronomeSourceRef.current = metronomeSource;
       startCtxTimeRef.current = when;
       startOffsetRef.current = offsetSec;
     },
@@ -246,7 +296,13 @@ export function PlayerProvider({
   );
 
   const play = useCallback(() => {
-    if (!(drumBufferRef.current && restBufferRef.current)) {
+    if (
+      !(
+        drumBufferRef.current &&
+        restBufferRef.current &&
+        metronomeBufferRef.current
+      )
+    ) {
       return;
     }
     const ctx = ensureContext();
@@ -321,6 +377,14 @@ export function PlayerProvider({
     }
   }, []);
 
+  const setMetronomeVolume = useCallback((value: number) => {
+    const clamped = Math.min(1, Math.max(0, value));
+    setMetronomeVolumeState(clamped);
+    if (metronomeGainRef.current) {
+      metronomeGainRef.current.gain.value = clamped;
+    }
+  }, []);
+
   const load = useCallback(
     async (songId: string): Promise<boolean> => {
       const ctx = ensureContext();
@@ -341,6 +405,7 @@ export function PlayerProvider({
         }
         drumBufferRef.current = decoded.drumBuffer;
         restBufferRef.current = decoded.restBuffer;
+        metronomeBufferRef.current = decoded.metronomeBuffer;
         const duration = Math.max(
           decoded.drumBuffer.duration,
           decoded.restBuffer.duration
@@ -379,6 +444,7 @@ export function PlayerProvider({
       drumVolume,
       durationSec,
       load,
+      metronomeVolume,
       pause,
       peaks,
       play,
@@ -387,6 +453,7 @@ export function PlayerProvider({
       restVolume,
       seek,
       setDrumVolume,
+      setMetronomeVolume,
       setRestVolume,
       status,
       toggle,
@@ -396,6 +463,7 @@ export function PlayerProvider({
       drumVolume,
       durationSec,
       load,
+      metronomeVolume,
       pause,
       peaks,
       play,
@@ -404,6 +472,7 @@ export function PlayerProvider({
       restVolume,
       seek,
       setDrumVolume,
+      setMetronomeVolume,
       setRestVolume,
       status,
       toggle,
