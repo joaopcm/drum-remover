@@ -79,7 +79,7 @@ export function MiniPlayer(): React.JSX.Element {
   } else if (playing) {
     transportIcon = <Pause className="size-5" />;
   } else {
-    transportIcon = <Play className="size-5 translate-x-0.5" />;
+    transportIcon = <Play className="size-5 translate-x-px" />;
   }
 
   return (

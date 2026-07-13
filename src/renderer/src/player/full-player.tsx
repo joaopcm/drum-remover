@@ -108,13 +108,13 @@ export function FullPlayer(): React.JSX.Element {
       )}
     >
       <header className="drag-region flex h-14 shrink-0 items-center justify-between border-border/60 border-b px-6">
-        <div className="min-w-0 pl-16">
-          <p className="truncate font-medium text-sm">
+        <div className="flex min-w-0 items-baseline gap-2.5 pl-16">
+          <span className="min-w-0 truncate font-display font-semibold text-[17px] tracking-tight">
             {song?.title ?? "Now playing"}
-          </p>
-          <p className="truncate text-muted text-xs">
+          </span>
+          <span className="shrink-0 text-muted text-sm">
             {song?.author ?? "Unknown artist"}
-          </p>
+          </span>
         </div>
         <Tooltip keys={["mod", "down"]} label="Minimize">
           <Button

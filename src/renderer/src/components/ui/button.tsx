@@ -19,7 +19,7 @@ const buttonVariants = cva(
       },
       variant: {
         default:
-          "bg-drum text-background shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_6px_18px_-8px_var(--color-drum)] hover:bg-drum/90",
+          "bg-drum text-background shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_0_0_1px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.4),0_4px_12px_-4px_color-mix(in_oklab,var(--color-drum)_55%,transparent)] hover:bg-[color-mix(in_oklab,var(--color-drum)_93%,white)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),inset_0_0_0_1px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.4),0_6px_18px_-4px_color-mix(in_oklab,var(--color-drum)_72%,transparent)]",
         destructive: "bg-destructive text-white hover:bg-destructive/90",
         ghost: "text-muted hover:bg-white/[0.07] hover:text-foreground",
         secondary:

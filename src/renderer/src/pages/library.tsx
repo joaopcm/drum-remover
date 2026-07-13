@@ -5,6 +5,7 @@ import { Kbd } from "@renderer/components/ui/kbd";
 import { Tooltip } from "@renderer/components/ui/tooltip";
 import { onSongAdded } from "@renderer/lib/events";
 import { cn } from "@renderer/lib/utils";
+import { isTypingTarget } from "@renderer/player/typing-target";
 import type { AppInfo, JobProgress, Song } from "@shared/types";
 import {
   AudioWaveform,
@@ -13,7 +14,7 @@ import {
   Settings as SettingsIcon,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /** Stages that mean a job is no longer actively reporting progress. */
 const TERMINAL_STATUSES = new Set<Song["status"]>(["ready", "error", "queued"]);
@@ -25,6 +26,7 @@ export function Library(): React.JSX.Element {
   const [songs, setSongs] = useState<Song[]>([]);
   const [progress, setProgress] = useState<Record<string, JobProgress>>({});
   const [query, setQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -85,6 +87,24 @@ export function Library(): React.JSX.Element {
     };
   }, []);
 
+  // `/` jumps focus into the search field, the way it does on most list-heavy
+  // apps. Ignored while typing so it never eats a literal slash.
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent): void {
+      if (
+        event.key === "/" &&
+        !(event.metaKey || event.ctrlKey || event.altKey) &&
+        !isTypingTarget(event.target) &&
+        searchRef.current
+      ) {
+        event.preventDefault();
+        searchRef.current.focus();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   function handleRemoved(id: string) {
     setSongs((prev) => prev.filter((s) => s.id !== id));
   }
@@ -124,7 +144,7 @@ export function Library(): React.JSX.Element {
               aria-label="Settings"
               className="no-drag"
               onClick={openSettings}
-              size="icon"
+              size="iconSm"
               variant="ghost"
             >
               <SettingsIcon className="size-4" />
@@ -148,6 +168,7 @@ export function Library(): React.JSX.Element {
                   className="h-10 w-full rounded-[var(--radius)] border border-border bg-surface/60 pr-9 pl-9 text-sm outline-none transition-[border-color,box-shadow] duration-150 ease-[var(--ease-out-quart)] placeholder:text-faint focus-visible:border-rest focus-visible:ring-2 focus-visible:ring-rest/25"
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search by title or artist…"
+                  ref={searchRef}
                   type="text"
                   value={query}
                 />
@@ -160,7 +181,12 @@ export function Library(): React.JSX.Element {
                   >
                     <X className="size-3.5" />
                   </button>
-                ) : null}
+                ) : (
+                  <Kbd
+                    className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-faint"
+                    keys={["/"]}
+                  />
+                )}
               </div>
               <span className="shrink-0 font-mono text-faint text-xs tabular-nums">
                 {filtered.length}

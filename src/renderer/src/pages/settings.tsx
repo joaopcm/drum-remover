@@ -123,7 +123,7 @@ export function Settings(): React.JSX.Element {
         <Tooltip keys={["esc"]} label="Back to library">
           <Button
             aria-label="Back to library"
-            className="no-drag ml-16"
+            className="no-drag ml-16 size-7"
             onClick={closeSettings}
             size="icon"
             variant="ghost"
@@ -131,7 +131,7 @@ export function Settings(): React.JSX.Element {
             <ArrowLeft className="size-4" />
           </Button>
         </Tooltip>
-        <span className="font-display font-semibold text-base tracking-tight">
+        <span className="font-display font-semibold text-[17px] tracking-tight">
           Settings
         </span>
       </header>
