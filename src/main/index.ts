@@ -167,6 +167,9 @@ function createWindow(): void {
     minWidth: 900,
     show: false,
     titleBarStyle: "hiddenInset",
+    // Vertically center the native traffic lights inside the 56px app header
+    // (h-14). Keeps them from looking bolted to the top-left corner.
+    trafficLightPosition: { x: 19, y: 21 },
     webPreferences: {
       preload: join(import.meta.dirname, "../preload/index.js"),
       sandbox: false,

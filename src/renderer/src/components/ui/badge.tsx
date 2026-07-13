@@ -3,25 +3,56 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 
 const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-medium font-mono text-[11px]",
+  "inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 font-medium font-mono text-[10px] uppercase leading-none tracking-[0.08em]",
   {
     defaultVariants: {
       tone: "neutral",
     },
     variants: {
       tone: {
-        destructive: "bg-destructive/15 text-destructive",
-        drum: "bg-drum/15 text-drum",
-        neutral: "bg-border/70 text-muted",
-        rest: "bg-rest/15 text-rest",
+        destructive: "bg-destructive/12 text-destructive",
+        drum: "bg-drum/12 text-drum",
+        neutral: "bg-white/[0.05] text-muted",
+        rest: "bg-rest/12 text-rest",
       },
     },
   }
 );
 
-export type BadgeProps = ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants>;
+const DOT_TONE: Record<string, string> = {
+  destructive: "bg-destructive",
+  drum: "bg-drum",
+  neutral: "bg-faint",
+  rest: "bg-rest",
+};
 
-export function Badge({ className, tone, ...props }: BadgeProps) {
-  return <span className={cn(badgeVariants({ tone }), className)} {...props} />;
+export type BadgeProps = ComponentProps<"span"> &
+  VariantProps<typeof badgeVariants> & {
+    /** Show a leading status dot. Animates while `pulse` is set. */
+    dot?: boolean;
+    pulse?: boolean;
+  };
+
+export function Badge({
+  className,
+  tone,
+  dot,
+  pulse,
+  children,
+  ...props
+}: BadgeProps) {
+  return (
+    <span className={cn(badgeVariants({ tone }), className)} {...props}>
+      {dot ? (
+        <span
+          className={cn(
+            "size-1.5 shrink-0 rounded-full",
+            DOT_TONE[tone ?? "neutral"],
+            pulse && "animate-pulse"
+          )}
+        />
+      ) : null}
+      {children}
+    </span>
+  );
 }

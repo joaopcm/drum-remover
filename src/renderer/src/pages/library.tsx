@@ -1,22 +1,30 @@
 import { useAppView } from "@renderer/app-view";
-import { AddSongDialog } from "@renderer/components/add-song-dialog";
 import { SongRow } from "@renderer/components/song-row";
 import { Button } from "@renderer/components/ui/button";
+import { Kbd } from "@renderer/components/ui/kbd";
+import { Tooltip } from "@renderer/components/ui/tooltip";
+import { onSongAdded } from "@renderer/lib/events";
 import { cn } from "@renderer/lib/utils";
 import type { AppInfo, JobProgress, Song } from "@shared/types";
-import { AudioWaveform, Plus, Settings as SettingsIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  AudioWaveform,
+  Plus,
+  Search,
+  Settings as SettingsIcon,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 /** Stages that mean a job is no longer actively reporting progress. */
 const TERMINAL_STATUSES = new Set<Song["status"]>(["ready", "error", "queued"]);
 
 export function Library(): React.JSX.Element {
-  const { activeSongId, minimized, openSettings } = useAppView();
+  const { activeSongId, minimized, openSettings, openAddSong } = useAppView();
   const miniBarPresent = minimized && activeSongId !== null;
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const [progress, setProgress] = useState<Record<string, JobProgress>>({});
-  const [addOpen, setAddOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -64,102 +72,166 @@ export function Library(): React.JSX.Element {
     const offProgress = window.api.onJobProgress((update) => {
       setProgress((prev) => ({ ...prev, [update.songId]: update }));
     });
+    // The add-song dialog lives at the app root; hear about new songs here.
+    const offAdded = onSongAdded((song) => {
+      setSongs((prev) =>
+        prev.some((s) => s.id === song.id) ? prev : [song, ...prev]
+      );
+    });
     return () => {
       offSong();
       offProgress();
+      offAdded();
     };
   }, []);
-
-  function handleAdded(song: Song) {
-    setSongs((prev) =>
-      prev.some((s) => s.id === song.id) ? prev : [song, ...prev]
-    );
-  }
 
   function handleRemoved(id: string) {
     setSongs((prev) => prev.filter((s) => s.id !== id));
   }
 
+  const normalizedQuery = query.trim().toLowerCase();
+  const filtered = useMemo(() => {
+    if (!normalizedQuery) {
+      return songs;
+    }
+    return songs.filter((song) => {
+      const haystack = `${song.title} ${song.author ?? ""}`.toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
+  }, [songs, normalizedQuery]);
+
+  const hasSongs = songs.length > 0;
+
   return (
     <div className="flex h-full flex-col">
-      <header className="drag-region flex items-center justify-between border-border border-b px-6 py-4">
+      <header className="drag-region flex h-14 shrink-0 items-center justify-between border-border/70 border-b px-6">
         <div className="flex items-center gap-2.5 pl-16">
-          <AudioWaveform className="size-5 text-drum" />
-          <span className="font-semibold text-base tracking-tight">
+          <span className="flex size-7 items-center justify-center rounded-md bg-drum/12 ring-1 ring-drum/20 ring-inset">
+            <AudioWaveform className="size-4 text-drum" />
+          </span>
+          <span className="font-display font-semibold text-[17px] tracking-tight">
             Socrash
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            className="no-drag"
-            onClick={() => setAddOpen(true)}
-            size="sm"
-          >
+        <div className="flex items-center gap-1.5">
+          <Button className="no-drag" onClick={openAddSong} size="sm">
             <Plus className="size-4" />
             Add song
+            <Kbd className="ml-0.5" keys={["mod", "n"]} />
           </Button>
-          <Button
-            aria-label="Settings"
-            className="no-drag"
-            onClick={openSettings}
-            size="icon"
-            variant="ghost"
-          >
-            <SettingsIcon className="size-4" />
-          </Button>
+          <Tooltip keys={["mod", ","]} label="Settings">
+            <Button
+              aria-label="Settings"
+              className="no-drag"
+              onClick={openSettings}
+              size="icon"
+              variant="ghost"
+            >
+              <SettingsIcon className="size-4" />
+            </Button>
+          </Tooltip>
         </div>
       </header>
 
       <main className="flex-1 overflow-y-auto">
-        {songs.length === 0 ? (
-          <div className="flex h-full items-center justify-center p-6">
-            <div className="flex max-w-md flex-col items-center text-center">
-              <div className="mb-5 flex size-16 items-center justify-center rounded-full border border-border bg-card">
-                <AudioWaveform className="size-7 text-drum" />
-              </div>
-              <h1 className="font-semibold text-2xl tracking-tight">
-                No songs yet
-              </h1>
-              <p className="mt-2 text-muted leading-relaxed">
-                Paste a YouTube link and Socrash pulls the drums out of the
-                track&nbsp;&mdash; fully offline, right on your machine.
-              </p>
-              <Button className="mt-6" onClick={() => setAddOpen(true)}>
-                <Plus className="size-4" />
-                Add your first song
-              </Button>
-            </div>
-          </div>
-        ) : (
+        {hasSongs ? (
           <div
             className={cn(
-              "mx-auto flex max-w-3xl flex-col gap-2 p-6",
+              "mx-auto flex max-w-3xl flex-col p-6",
               miniBarPresent && "pb-28"
             )}
           >
-            {songs.map((song) => (
-              <SongRow
-                key={song.id}
-                onRemoved={handleRemoved}
-                progress={progress[song.id]}
-                song={song}
-              />
-            ))}
+            <div className="mb-4 flex items-center gap-3">
+              <div className="group relative flex-1">
+                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-faint transition-colors group-focus-within:text-muted" />
+                <input
+                  className="h-10 w-full rounded-[var(--radius)] border border-border bg-surface/60 pr-9 pl-9 text-sm outline-none transition-[border-color,box-shadow] duration-150 ease-[var(--ease-out-quart)] placeholder:text-faint focus-visible:border-rest focus-visible:ring-2 focus-visible:ring-rest/25"
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search by title or artist…"
+                  type="text"
+                  value={query}
+                />
+                {query ? (
+                  <button
+                    aria-label="Clear search"
+                    className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-faint transition-colors hover:bg-white/[0.07] hover:text-foreground"
+                    onClick={() => setQuery("")}
+                    type="button"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                ) : null}
+              </div>
+              <span className="shrink-0 font-mono text-faint text-xs tabular-nums">
+                {filtered.length}
+                {normalizedQuery ? `/${songs.length}` : ""}{" "}
+                {songs.length === 1 && !normalizedQuery ? "song" : "songs"}
+              </span>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div className="flex flex-col items-center py-16 text-center">
+                <div className="mb-4 flex size-12 items-center justify-center rounded-full border border-border bg-card">
+                  <Search className="size-5 text-faint" />
+                </div>
+                <p className="font-medium text-sm">No matches</p>
+                <p className="mt-1 text-muted text-sm">
+                  Nothing in your library matches &ldquo;{query.trim()}&rdquo;.
+                </p>
+                <Button
+                  className="mt-4"
+                  onClick={() => setQuery("")}
+                  size="sm"
+                  variant="secondary"
+                >
+                  Clear search
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                {filtered.map((song, index) => (
+                  <SongRow
+                    index={index}
+                    key={song.id}
+                    onRemoved={handleRemoved}
+                    progress={progress[song.id]}
+                    song={song}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex h-full items-center justify-center p-6">
+            <div className="flex max-w-md flex-col items-center text-center">
+              <div className="relative mb-6 flex size-20 items-center justify-center rounded-2xl border border-border bg-card shadow-[0_20px_50px_-24px_var(--color-drum)]">
+                <span className="absolute inset-0 rounded-2xl bg-drum/[0.06]" />
+                <AudioWaveform className="size-8 text-drum" />
+              </div>
+              <h1 className="font-display font-semibold text-3xl tracking-tight">
+                No songs yet
+              </h1>
+              <p className="mt-2.5 text-balance text-muted leading-relaxed">
+                Paste a YouTube link and Socrash pulls the drums out of the
+                track&nbsp;&mdash; fully offline, right on your machine.
+              </p>
+              <Button className="mt-7" onClick={openAddSong}>
+                <Plus className="size-4" />
+                Add your first song
+                <Kbd className="ml-0.5" keys={["mod", "n"]} />
+              </Button>
+            </div>
           </div>
         )}
       </main>
 
-      <footer className="border-border border-t px-6 py-2 font-mono text-[11px] text-muted">
-        {appInfo
-          ? `${appInfo.name} v${appInfo.version} · Electron ${appInfo.electron} · Node ${appInfo.node}`
-          : "Loading…"}
+      <footer className="shrink-0 border-border/70 border-t px-6 py-2 font-mono text-[11px] text-faint">
+        <span className="selectable">
+          {appInfo
+            ? `${appInfo.name} v${appInfo.version} · Electron ${appInfo.electron} · Node ${appInfo.node}`
+            : "Loading…"}
+        </span>
       </footer>
-
-      <AddSongDialog
-        onAdded={handleAdded}
-        onOpenChange={setAddOpen}
-        open={addOpen}
-      />
     </div>
   );
 }

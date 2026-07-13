@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@renderer/components/ui/dialog";
 import { Input } from "@renderer/components/ui/input";
+import { Kbd } from "@renderer/components/ui/kbd";
 import { Skeleton } from "@renderer/components/ui/skeleton";
 import type { Song, YouTubeMeta } from "@shared/types";
 import { Check, Loader2 } from "lucide-react";
@@ -117,6 +118,7 @@ export function AddSongDialog({
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                e.preventDefault();
                 handleSubmit();
               }
             }}
@@ -178,6 +180,7 @@ export function AddSongDialog({
           >
             {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
             Add song
+            <Kbd className="ml-0.5" keys={["mod", "enter"]} />
           </Button>
         </div>
       </DialogPopup>

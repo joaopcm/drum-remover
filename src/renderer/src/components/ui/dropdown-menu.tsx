@@ -15,7 +15,7 @@ export function DropdownMenuContent({
       <Menu.Positioner align="end" sideOffset={6}>
         <Menu.Popup
           className={cn(
-            "z-50 min-w-40 origin-[var(--transform-origin)] rounded-[var(--radius)] border border-border bg-card p-1 shadow-2xl transition-all duration-150 ease-out data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+            "z-50 min-w-44 origin-[var(--transform-origin)] rounded-[var(--radius)] border border-border-strong bg-elevated p-1 shadow-[0_18px_50px_-16px_rgba(0,0,0,0.75)] transition-all duration-150 ease-[var(--ease-out-quart)] data-[ending-style]:scale-[0.97] data-[starting-style]:scale-[0.97] data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
             className
           )}
           {...props}
@@ -34,7 +34,7 @@ export function DropdownMenuItem({
   return (
     <Menu.Item
       className={cn(
-        "flex cursor-default items-center gap-2 rounded-[calc(var(--radius)-0.25rem)] px-2.5 py-1.5 text-sm outline-none transition-colors data-[highlighted]:bg-border/60",
+        "flex cursor-default items-center gap-2.5 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-muted text-sm outline-none transition-colors data-[highlighted]:bg-white/[0.06] data-[highlighted]:text-foreground",
         className
       )}
       {...props}

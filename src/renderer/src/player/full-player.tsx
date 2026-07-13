@@ -1,12 +1,15 @@
 import { useAppView } from "@renderer/app-view";
 import { Button } from "@renderer/components/ui/button";
+import { Kbd } from "@renderer/components/ui/kbd";
 import { Slider } from "@renderer/components/ui/slider";
+import { Tooltip } from "@renderer/components/ui/tooltip";
 import { formatDuration } from "@renderer/lib/format";
 import { cn } from "@renderer/lib/utils";
 import type { Song } from "@shared/types";
 import { ChevronDown, Loader2, Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePlayer } from "./player-provider";
+import { isTypingTarget } from "./typing-target";
 import { Waveform } from "./waveform";
 
 export function FullPlayer(): React.JSX.Element {
@@ -73,7 +76,11 @@ export function FullPlayer(): React.JSX.Element {
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.code === "Space") {
+      if (
+        event.code === "Space" &&
+        !isTypingTarget(event.target) &&
+        !(event.metaKey || event.ctrlKey)
+      ) {
         event.preventDefault();
         toggle();
       }
@@ -100,8 +107,8 @@ export function FullPlayer(): React.JSX.Element {
         show ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
       )}
     >
-      <header className="drag-region flex items-center justify-between px-6 py-4 pl-24">
-        <div className="min-w-0">
+      <header className="drag-region flex h-14 shrink-0 items-center justify-between border-border/60 border-b px-6">
+        <div className="min-w-0 pl-16">
           <p className="truncate font-medium text-sm">
             {song?.title ?? "Now playing"}
           </p>
@@ -109,15 +116,17 @@ export function FullPlayer(): React.JSX.Element {
             {song?.author ?? "Unknown artist"}
           </p>
         </div>
-        <Button
-          aria-label="Minimize player"
-          className="no-drag"
-          onClick={minimizePlayer}
-          size="icon"
-          variant="ghost"
-        >
-          <ChevronDown className="size-5" />
-        </Button>
+        <Tooltip keys={["mod", "down"]} label="Minimize">
+          <Button
+            aria-label="Minimize player"
+            className="no-drag"
+            onClick={minimizePlayer}
+            size="icon"
+            variant="ghost"
+          >
+            <ChevronDown className="size-5" />
+          </Button>
+        </Tooltip>
       </header>
 
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center gap-8 px-8 pb-10">
@@ -140,7 +149,7 @@ export function FullPlayer(): React.JSX.Element {
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-3">
           <Button
             aria-label={playing ? "Pause" : "Play"}
             className="size-14 rounded-full"
@@ -150,6 +159,10 @@ export function FullPlayer(): React.JSX.Element {
           >
             {transportIcon}
           </Button>
+          <span className="flex items-center gap-1.5 text-faint text-xs">
+            <Kbd keys={["space"]} />
+            play / pause
+          </span>
         </div>
 
         <div className="grid gap-5">

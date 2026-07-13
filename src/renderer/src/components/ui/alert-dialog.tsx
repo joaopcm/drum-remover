@@ -13,10 +13,10 @@ export function AlertDialogPopup({
 }: ComponentProps<typeof BaseAlertDialog.Popup>) {
   return (
     <BaseAlertDialog.Portal>
-      <BaseAlertDialog.Backdrop className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[2px] transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
+      <BaseAlertDialog.Backdrop className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[3px] transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
       <BaseAlertDialog.Popup
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-[var(--radius)] border border-border bg-card p-6 shadow-2xl transition-all duration-200 ease-out data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+          "fixed top-1/2 left-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-[var(--radius-lg)] border border-border-strong bg-card p-6 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.8)] transition-all duration-200 ease-[var(--ease-out-quart)] data-[ending-style]:scale-[0.97] data-[starting-style]:scale-[0.97] data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
           className
         )}
         {...props}

@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@renderer/components/ui/card";
 import { Skeleton } from "@renderer/components/ui/skeleton";
+import { Tooltip } from "@renderer/components/ui/tooltip";
 import { formatBytes } from "@renderer/lib/format";
 import type {
   MigrationProgress,
@@ -118,17 +119,21 @@ export function Settings(): React.JSX.Element {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="drag-region flex items-center gap-3 border-border border-b px-6 py-4">
-        <Button
-          aria-label="Back to library"
-          className="no-drag ml-16"
-          onClick={closeSettings}
-          size="icon"
-          variant="ghost"
-        >
-          <ArrowLeft className="size-4" />
-        </Button>
-        <span className="font-semibold text-base tracking-tight">Settings</span>
+      <header className="drag-region flex h-14 shrink-0 items-center gap-2.5 border-border/70 border-b px-6">
+        <Tooltip keys={["esc"]} label="Back to library">
+          <Button
+            aria-label="Back to library"
+            className="no-drag ml-16"
+            onClick={closeSettings}
+            size="icon"
+            variant="ghost"
+          >
+            <ArrowLeft className="size-4" />
+          </Button>
+        </Tooltip>
+        <span className="font-display font-semibold text-base tracking-tight">
+          Settings
+        </span>
       </header>
 
       <main className="flex-1 overflow-y-auto">
