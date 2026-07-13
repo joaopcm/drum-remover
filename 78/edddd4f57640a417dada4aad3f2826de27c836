@@ -1,0 +1,22 @@
+src/renderer/src/components/ui/kbd.tsx
+  s_dab8bbe6ec6979::t_e0cb194f4380fb 21,23
+src/renderer/src/player/full-player.tsx
+  s_dab8bbe6ec6979::t_d549d9d43f12a1 9-20,25-35,60-74,113-119,123-126,128-130,133-138,143,146-159,173,177-181,183,186,188,190-235,237-293,295,298-300,302,305-309,311,314,316-408
+  s_dab8bbe6ec6979::t_c9f8d432bf0d71 182,184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "78edddd4f57640a417dada4aad3f2826de27c836",
+  "prompts": {},
+  "sessions": {
+    "s_dab8bbe6ec6979": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "df330f95-06cc-4158-a2b1-06dbf2787923",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
