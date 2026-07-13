@@ -257,7 +257,7 @@ export function FullPlayer(): React.JSX.Element {
                 >
                   <span className="relative flex items-center justify-center">
                     <RotateCcw className="size-5" />
-                    <span className="-translate-y-px pointer-events-none absolute font-mono font-semibold text-[7px] leading-none">
+                    <span className="pointer-events-none absolute -translate-y-px font-mono font-semibold text-[7px] leading-none">
                       10
                     </span>
                   </span>
@@ -280,7 +280,12 @@ export function FullPlayer(): React.JSX.Element {
                   size="icon"
                   variant="ghost"
                 >
-                  <FastForward className="size-5" />
+                  <span className="relative flex items-center justify-center">
+                    <RotateCw className="size-5" />
+                    <span className="pointer-events-none absolute -translate-y-px font-mono font-semibold text-[7px] leading-none">
+                      10
+                    </span>
+                  </span>
                 </Button>
               </Tooltip>
             </div>
