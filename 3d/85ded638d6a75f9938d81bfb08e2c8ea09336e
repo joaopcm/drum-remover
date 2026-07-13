@@ -1,0 +1,47 @@
+.github/workflows/release.yml
+  s_d0174175dcbed1::t_683c8ca8bfc61d 35-40,47-49,54,68-73
+electron.vite.config.ts
+  s_d0174175dcbed1::t_2e11123957e87e 18-25
+package.json
+  s_d0174175dcbed1::t_a4126b03228024 7
+src/main/build-info.ts
+  s_d0174175dcbed1::t_5dcccfdf1b2c02 1-12
+src/main/index.ts
+  s_d0174175dcbed1::t_6f8af434e1cdc5 28,50-54,57-58,61,63-66,72-88,316-343,406-412
+src/main/update/install-script.test.ts
+  s_d0174175dcbed1::t_4302fe6b399386 1-37
+src/main/update/install-script.ts
+  s_d0174175dcbed1::t_cb22e57189872e 1-48
+src/main/update/release.test.ts
+  s_d0174175dcbed1::t_b858ddef3966ac 1-69
+src/main/update/release.ts
+  s_d0174175dcbed1::t_717af001ddeb93 1-66
+src/main/update/updater.ts
+  s_d0174175dcbed1::t_a17f63d5a61fd1 1-126
+src/preload/index.ts
+  s_d0174175dcbed1::t_d416b8da90abec 9-10,16-17,56-72,78
+src/renderer/src/app.tsx
+  s_d0174175dcbed1::t_247d22b2b39582 2,27
+src/renderer/src/components/update-card.tsx
+  s_d0174175dcbed1::t_90e40dfdbd0a09 1-160
+src/shared/ipc.ts
+  s_d0174175dcbed1::t_06f11410acdc0e 11-12,23-26,47-52,67-70,109-117,125-130
+src/shared/types.ts
+  s_d0174175dcbed1::t_04231a8ce8995c 119-134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "3d85ded638d6a75f9938d81bfb08e2c8ea09336e",
+  "prompts": {},
+  "sessions": {
+    "s_d0174175dcbed1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "491317f3-fb06-4a40-89f3-afd189832304",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
