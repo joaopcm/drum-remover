@@ -1,0 +1,20 @@
+src/renderer/src/pages/library.tsx
+  s_dab8bbe6ec6979::t_3ddc7181e17e16 164-186,188
+  s_dab8bbe6ec6979::t_b2a3ee3e7e11b2 247-248,253-259
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "2e9dbacc1f0af7649f8c97a9dc96f1e5132c6b58",
+  "prompts": {},
+  "sessions": {
+    "s_dab8bbe6ec6979": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "df330f95-06cc-4158-a2b1-06dbf2787923",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
