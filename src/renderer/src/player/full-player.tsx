@@ -256,8 +256,8 @@ export function FullPlayer(): React.JSX.Element {
                   variant="ghost"
                 >
                   <span className="relative flex items-center justify-center">
-                    <RotateCcw className="size-5" />
-                    <span className="pointer-events-none absolute -translate-y-px font-mono font-semibold text-[7px] leading-none">
+                    <RotateCcw className="size-6" />
+                    <span className="pointer-events-none absolute translate-y-[0.5px] font-mono font-semibold text-[8px] tabular-nums leading-none">
                       10
                     </span>
                   </span>
@@ -281,8 +281,8 @@ export function FullPlayer(): React.JSX.Element {
                   variant="ghost"
                 >
                   <span className="relative flex items-center justify-center">
-                    <RotateCw className="size-5" />
-                    <span className="pointer-events-none absolute -translate-y-px font-mono font-semibold text-[7px] leading-none">
+                    <RotateCw className="size-6" />
+                    <span className="pointer-events-none absolute translate-y-[0.5px] font-mono font-semibold text-[8px] tabular-nums leading-none">
                       10
                     </span>
                   </span>
