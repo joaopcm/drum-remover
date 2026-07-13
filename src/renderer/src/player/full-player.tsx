@@ -165,7 +165,7 @@ export function FullPlayer(): React.JSX.Element {
   } else if (playing) {
     transportIcon = <Pause className="size-6" />;
   } else {
-    transportIcon = <Play className="size-6 translate-x-0.5" />;
+    transportIcon = <Play className="size-6 translate-x-[1.5px]" />;
   }
 
   return (
