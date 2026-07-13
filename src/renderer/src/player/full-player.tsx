@@ -22,10 +22,12 @@ export function FullPlayer(): React.JSX.Element {
     durationSec,
     drumVolume,
     restVolume,
+    metronomeVolume,
     peaks,
     seek,
     setDrumVolume,
     setRestVolume,
+    setMetronomeVolume,
   } = usePlayer();
 
   const [song, setSong] = useState<Song | null>(null);
@@ -152,7 +154,7 @@ export function FullPlayer(): React.JSX.Element {
 
         <div className="grid gap-5">
           <div className="flex items-center gap-4">
-            <span className="w-14 font-medium text-drum text-sm">Drums</span>
+            <span className="w-20 font-medium text-drum text-sm">Drums</span>
             <Slider
               accentClassName="bg-drum"
               aria-label="Drums volume"
@@ -164,7 +166,7 @@ export function FullPlayer(): React.JSX.Element {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="w-14 font-medium text-rest text-sm">Rest</span>
+            <span className="w-20 font-medium text-rest text-sm">Rest</span>
             <Slider
               accentClassName="bg-rest"
               aria-label="Rest volume"
@@ -173,6 +175,20 @@ export function FullPlayer(): React.JSX.Element {
             />
             <span className="w-11 text-right font-mono text-muted text-xs tabular-nums">
               {Math.round(restVolume * 100)}%
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="w-20 font-medium text-metronome text-sm">
+              Metronome
+            </span>
+            <Slider
+              accentClassName="bg-metronome"
+              aria-label="Metronome volume"
+              onValueChange={setMetronomeVolume}
+              value={metronomeVolume}
+            />
+            <span className="w-11 text-right font-mono text-muted text-xs tabular-nums">
+              {Math.round(metronomeVolume * 100)}%
             </span>
           </div>
         </div>
