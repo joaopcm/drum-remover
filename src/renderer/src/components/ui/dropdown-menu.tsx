@@ -12,7 +12,7 @@ export function DropdownMenuContent({
 }: ComponentProps<typeof Menu.Popup>) {
   return (
     <Menu.Portal>
-      <Menu.Positioner align="end" sideOffset={6}>
+      <Menu.Positioner align="end" className="z-50" sideOffset={6}>
         <Menu.Popup
           className={cn(
             "z-50 min-w-44 origin-[var(--transform-origin)] rounded-[var(--radius)] border border-border-strong bg-elevated p-1 shadow-[0_18px_50px_-16px_rgba(0,0,0,0.75)] transition-all duration-150 ease-[var(--ease-out-quart)] data-[ending-style]:scale-[0.97] data-[starting-style]:scale-[0.97] data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
