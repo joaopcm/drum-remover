@@ -66,6 +66,14 @@ export function SongRow({ song, onRemoved, progress }: SongRowProps) {
     });
   }
 
+  function requestDelete() {
+    // Defer opening the dialog until after the menu has finished its
+    // close + focus-restoration cycle. Opening synchronously from the
+    // item press lets the menu's dismissal immediately swallow the
+    // dialog, so the confirmation never appears.
+    requestAnimationFrame(() => setConfirmOpen(true));
+  }
+
   return (
     <div
       className={cn(
@@ -156,7 +164,7 @@ export function SongRow({ song, onRemoved, progress }: SongRowProps) {
             ) : null}
             <DropdownMenuItem
               className="text-destructive hover:bg-destructive/10 hover:text-destructive data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive"
-              onClick={() => setConfirmOpen(true)}
+              onClick={requestDelete}
             >
               <Trash2 className="size-4" />
               Delete
