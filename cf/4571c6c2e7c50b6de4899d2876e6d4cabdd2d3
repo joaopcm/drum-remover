@@ -1,0 +1,20 @@
+src/renderer/src/components/song-row.tsx
+  s_68043034855014::t_79e902843a6fba 167
+  s_68043034855014::t_931a563c7c80f7 69-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "cf4571c6c2e7c50b6de4899d2876e6d4cabdd2d3",
+  "prompts": {},
+  "sessions": {
+    "s_68043034855014": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "df481052-d6d9-428b-9c93-1f0b478859e8",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
