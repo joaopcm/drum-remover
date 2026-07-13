@@ -30,18 +30,12 @@ import {
 import { useState } from "react";
 
 interface SongRowProps {
-  index?: number;
   onRemoved: (id: string) => void;
   progress?: JobProgress;
   song: Song;
 }
 
-export function SongRow({
-  song,
-  onRemoved,
-  progress,
-  index = 0,
-}: SongRowProps) {
+export function SongRow({ song, onRemoved, progress }: SongRowProps) {
   const { openPlayer } = useAppView();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -75,11 +69,8 @@ export function SongRow({
   return (
     <div
       className={cn(
-        "group relative flex animate-row-in items-center gap-3.5 overflow-hidden rounded-[var(--radius)] border border-border bg-card/50 px-3 py-2.5 transition-[background-color,border-color] duration-200 ease-[var(--ease-out-quart)] hover:border-border-strong hover:bg-elevated/70"
+        "group relative flex items-center gap-3.5 overflow-hidden rounded-[var(--radius)] border border-border bg-card/50 px-3 py-2.5 transition-[background-color,border-color] duration-200 ease-[var(--ease-out-quart)] hover:border-border-strong hover:bg-elevated/70"
       )}
-      // Small cascade as the list first paints; capped so long libraries don't
-      // stall on entrance.
-      style={{ animationDelay: `${Math.min(index, 12) * 35}ms` }}
     >
       {ready ? (
         <button

@@ -208,9 +208,8 @@ export function Library(): React.JSX.Element {
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
-                {filtered.map((song, index) => (
+                {filtered.map((song) => (
                   <SongRow
-                    index={index}
                     key={song.id}
                     onRemoved={handleRemoved}
                     progress={progress[song.id]}
