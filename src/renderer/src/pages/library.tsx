@@ -161,38 +161,31 @@ export function Library(): React.JSX.Element {
               miniBarPresent && "pb-28"
             )}
           >
-            <div className="mb-4 flex items-center gap-3">
-              <div className="group relative flex-1">
-                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-faint transition-colors group-focus-within:text-muted" />
-                <input
-                  className="h-10 w-full rounded-[var(--radius)] border border-border bg-surface/60 pr-9 pl-9 text-sm outline-none transition-[border-color,box-shadow] duration-150 ease-[var(--ease-out-quart)] placeholder:text-faint focus-visible:border-rest focus-visible:ring-2 focus-visible:ring-rest/25"
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search by title or artist…"
-                  ref={searchRef}
-                  type="text"
-                  value={query}
+            <div className="group relative mb-4">
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-faint transition-colors group-focus-within:text-muted" />
+              <input
+                className="h-10 w-full rounded-[var(--radius)] border border-border bg-surface/60 pr-9 pl-9 text-sm outline-none transition-[border-color,box-shadow] duration-150 ease-[var(--ease-out-quart)] placeholder:text-faint focus-visible:border-rest focus-visible:ring-2 focus-visible:ring-rest/25"
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by title or artist…"
+                ref={searchRef}
+                type="text"
+                value={query}
+              />
+              {query ? (
+                <button
+                  aria-label="Clear search"
+                  className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-faint transition-colors hover:bg-white/[0.07] hover:text-foreground"
+                  onClick={() => setQuery("")}
+                  type="button"
+                >
+                  <X className="size-3.5" />
+                </button>
+              ) : (
+                <Kbd
+                  className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-faint"
+                  keys={["/"]}
                 />
-                {query ? (
-                  <button
-                    aria-label="Clear search"
-                    className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-faint transition-colors hover:bg-white/[0.07] hover:text-foreground"
-                    onClick={() => setQuery("")}
-                    type="button"
-                  >
-                    <X className="size-3.5" />
-                  </button>
-                ) : (
-                  <Kbd
-                    className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-faint"
-                    keys={["/"]}
-                  />
-                )}
-              </div>
-              <span className="shrink-0 font-mono text-faint text-xs tabular-nums">
-                {filtered.length}
-                {normalizedQuery ? `/${songs.length}` : ""}{" "}
-                {songs.length === 1 && !normalizedQuery ? "song" : "songs"}
-              </span>
+              )}
             </div>
 
             {filtered.length === 0 ? (
@@ -251,12 +244,19 @@ export function Library(): React.JSX.Element {
         )}
       </main>
 
-      <footer className="shrink-0 border-border/70 border-t px-6 py-2 font-mono text-[11px] text-faint">
-        <span className="selectable">
+      <footer className="flex shrink-0 items-center justify-between gap-4 border-border/70 border-t px-6 py-2 font-mono text-[11px] text-faint">
+        <span className="selectable truncate">
           {appInfo
             ? `${appInfo.name} v${appInfo.version} · Electron ${appInfo.electron} · Node ${appInfo.node}`
             : "Loading…"}
         </span>
+        {hasSongs ? (
+          <span className="shrink-0 tabular-nums">
+            {filtered.length}
+            {normalizedQuery ? ` of ${songs.length}` : ""}{" "}
+            {songs.length === 1 && !normalizedQuery ? "song" : "songs"}
+          </span>
+        ) : null}
       </footer>
     </div>
   );
