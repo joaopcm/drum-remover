@@ -1,0 +1,19 @@
+scripts/adhoc-sign.cjs
+  s_d0174175dcbed1::t_9e1c51345cbc81 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "bed9a700d70ae289221c4adc46d516ffd6983df8",
+  "prompts": {},
+  "sessions": {
+    "s_d0174175dcbed1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "491317f3-fb06-4a40-89f3-afd189832304",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
