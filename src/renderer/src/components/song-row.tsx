@@ -164,7 +164,7 @@ export function SongRow({
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuItem
-              className="text-destructive data-[highlighted]:text-destructive"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive"
               onClick={() => setConfirmOpen(true)}
             >
               <Trash2 className="size-4" />

@@ -34,7 +34,9 @@ export function DropdownMenuItem({
   return (
     <Menu.Item
       className={cn(
-        "flex cursor-default items-center gap-2.5 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-muted text-sm outline-none transition-colors data-[highlighted]:bg-white/[0.06] data-[highlighted]:text-foreground",
+        // Base UI (rc) only sets `data-highlighted` via keyboard navigation, so
+        // pointer feedback needs an explicit `:hover` alongside it.
+        "flex cursor-default items-center gap-2.5 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-muted text-sm outline-none transition-colors hover:bg-white/[0.06] hover:text-foreground data-[highlighted]:bg-white/[0.06] data-[highlighted]:text-foreground",
         className
       )}
       {...props}

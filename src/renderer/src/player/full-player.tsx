@@ -8,11 +8,11 @@ import { cn } from "@renderer/lib/utils";
 import type { Song } from "@shared/types";
 import {
   ChevronDown,
-  FastForward,
   Loader2,
   Pause,
   Play,
-  Rewind,
+  RotateCcw,
+  RotateCw,
   SkipBack,
   Volume2,
   VolumeX,
@@ -255,7 +255,12 @@ export function FullPlayer(): React.JSX.Element {
                   size="icon"
                   variant="ghost"
                 >
-                  <Rewind className="size-5" />
+                  <span className="relative flex items-center justify-center">
+                    <RotateCcw className="size-5" />
+                    <span className="-translate-y-px pointer-events-none absolute font-mono font-semibold text-[7px] leading-none">
+                      10
+                    </span>
+                  </span>
                 </Button>
               </Tooltip>
               <Button
