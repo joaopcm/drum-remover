@@ -1,0 +1,21 @@
+src/renderer/src/player/full-player.tsx
+  s_498369abe63bdd::t_6df1d407bbe372 285
+  s_498369abe63bdd::t_4c7023e902113f 283-284,286-288
+  s_498369abe63bdd::t_92b50d957ea3f0 260
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "6c58e1ffd826ff8ae0ac446d0cb667bdaab5abf1",
+  "prompts": {},
+  "sessions": {
+    "s_498369abe63bdd": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7c2a36c1-ba20-47b6-9fc3-d58aa78f7a8c",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
