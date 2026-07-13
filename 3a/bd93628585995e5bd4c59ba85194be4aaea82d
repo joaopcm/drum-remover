@@ -1,0 +1,20 @@
+src/renderer/src/player/waveform.tsx
+  s_0e88864170df2e::t_b3449258b76ad1 158-161,166-167,172
+  s_0e88864170df2e::t_b3bf78f68cbfa6 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "3abd93628585995e5bd4c59ba85194be4aaea82d",
+  "prompts": {},
+  "sessions": {
+    "s_0e88864170df2e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "2c05214b-160d-4194-916f-9efc3cb82405",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
