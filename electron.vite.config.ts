@@ -15,6 +15,14 @@ export default defineConfig({
         },
       },
     },
+    // Baked in by CI (see .github/workflows/release.yml) so the updater can
+    // tell whether a GitHub release is newer than the running build; "dev"
+    // for local/unpackaged builds where auto-update is disabled.
+    define: {
+      __SOCRASH_BUILD_TAG__: JSON.stringify(
+        process.env.SOCRASH_BUILD_TAG ?? "dev"
+      ),
+    },
     // Keep node deps (e.g. ffmpeg-static, which resolves a native binary path
     // at runtime) external rather than bundled.
     plugins: [externalizeDepsPlugin()],
