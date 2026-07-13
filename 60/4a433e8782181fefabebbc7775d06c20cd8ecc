@@ -1,0 +1,94 @@
+src/renderer/src/components/ui/button.tsx
+  s_dab8bbe6ec6979::t_bac83644b34be8 6,16,21-22,24,26
+src/renderer/src/pages/library.tsx
+  s_dab8bbe6ec6979::t_c72e28356dde34 4-6,9-16,22,27,75-80,84,92-104,107,109-112,116-117,120,122-132,137-145,147-156,158-204,207-209,211,214,218,221,228-233
+  s_dab8bbe6ec6979::t_cd7491ddc4a06a 146,157
+src/renderer/src/components/ui/kbd.tsx
+  s_dab8bbe6ec6979::t_95ecd60f819536 42-44
+  s_dab8bbe6ec6979::t_53e1962ddc86bb 23
+  s_dab8bbe6ec6979::t_cd7491ddc4a06a 11-12
+  s_dab8bbe6ec6979::t_63528e65997f3a 1-10,13-22,24-41,48-55
+  s_dab8bbe6ec6979::t_0788685ee8b300 45-47
+src/renderer/src/components/ui/dialog.tsx
+  s_dab8bbe6ec6979::t_76370225916731 16,19
+src/renderer/src/components/song-row.tsx
+  s_dab8bbe6ec6979::t_7b7452e3cac64b 17,20,33,51,76-105,109-114,122,127-129,131-141,143-171,173-175,181,185,220-235
+  s_dab8bbe6ec6979::t_cd7491ddc4a06a 39-44
+  s_dab8bbe6ec6979::t_42b2a2d35163c8 236-238
+src/renderer/src/components/add-song-dialog.tsx
+  s_dab8bbe6ec6979::t_d72af6edd3871e 10
+  s_dab8bbe6ec6979::t_422fede607aaad 121
+  s_dab8bbe6ec6979::t_53fd07872036f0 183
+src/renderer/src/player/typing-target.ts
+  s_dab8bbe6ec6979::t_7f11c52825345c 1-9
+src/renderer/src/components/ui/tooltip.tsx
+  s_dab8bbe6ec6979::t_e097f341c29659 36
+  s_dab8bbe6ec6979::t_df0ca56b309fbc 1-35,37-47
+src/renderer/src/app-view.tsx
+  s_dab8bbe6ec6979::t_da86bdb2588fb7 82,87,91,96,101
+  s_dab8bbe6ec6979::t_ae92eac1a6d974 44-48
+  s_dab8bbe6ec6979::t_a21081d5546074 14,19,23
+src/renderer/src/lib/events.ts
+  s_dab8bbe6ec6979::t_cf02ae4017959d 1-11,15-23
+  s_dab8bbe6ec6979::t_cd7491ddc4a06a 12-14
+src/renderer/src/lib/use-global-shortcuts.ts
+  s_dab8bbe6ec6979::t_541ab4e219aec9 1-30,42,59,64,75,86-102
+  s_dab8bbe6ec6979::t_5edab22b144984 31,44-57
+  s_dab8bbe6ec6979::t_c3c38149a64604 32-41,43,58,60-63,65-74,76-85
+src/renderer/src/components/ui/badge.tsx
+  s_dab8bbe6ec6979::t_3b1e669fde211a 6,13-16,22-28,30-34,36-57
+package.json
+  s_dab8bbe6ec6979::t_9d8539d9210046 29
+src/renderer/src/components/ui/card.tsx
+  s_dab8bbe6ec6979::t_ccf0432917b440 8
+src/renderer/src/components/ui/alert-dialog.tsx
+  s_dab8bbe6ec6979::t_5974e56dfa1137 16,19
+src/renderer/src/assets/main.css
+  s_dab8bbe6ec6979::t_cd7491ddc4a06a 83,95,115,117,128,148,159-160
+  s_dab8bbe6ec6979::t_2fdd0ea3746c26 88-90
+  s_dab8bbe6ec6979::t_ee1d862ea87e30 110,121
+  s_dab8bbe6ec6979::t_cb54029d7e65f2 3,7-10,12-17,19-21,29-40,42-63,84-87,91-94,96-109,111-114,116,118-120,122-127,129-133,145-147,149-158,161-165
+  s_dab8bbe6ec6979::t_beefddfc1d704b 166
+src/renderer/src/pages/settings.tsx
+  s_dab8bbe6ec6979::t_99f5f6422d47c0 122-136
+  s_dab8bbe6ec6979::t_92fb1ec09f2675 19
+src/main/index.ts
+  s_dab8bbe6ec6979::t_c7f7364abc640b 170-172
+src/renderer/src/components/ui/dropdown-menu.tsx
+  s_dab8bbe6ec6979::t_30b4ee5c695dce 37
+  s_dab8bbe6ec6979::t_453a9d3c0ab18c 18
+src/renderer/src/app.tsx
+  s_dab8bbe6ec6979::t_bdd32bfd924fb7 47-49
+  s_dab8bbe6ec6979::t_3cc8baae70f305 2,5-6,14-15,17,34-38
+  s_dab8bbe6ec6979::t_4bcf41afab153d 3
+src/renderer/src/player/full-player.tsx
+  s_dab8bbe6ec6979::t_7bf29068eae378 79-83
+  s_dab8bbe6ec6979::t_cf1b491dea7afe 110-111,119-129
+  s_dab8bbe6ec6979::t_5e30861cac9964 3,5,12
+  s_dab8bbe6ec6979::t_efc5e5ca9c3002 152,162-165
+src/renderer/src/player/mini-player.tsx
+  s_dab8bbe6ec6979::t_b696f2319bdf7a 3,10
+  s_dab8bbe6ec6979::t_8e61b443a35e34 52-53
+  s_dab8bbe6ec6979::t_5b565cf7927d87 134-144
+  s_dab8bbe6ec6979::t_47f0655608abd6 146-155
+src/renderer/src/components/ui/input.tsx
+  s_dab8bbe6ec6979::t_7d8084457c1ac5 8
+pnpm-lock.yaml
+  s_dab8bbe6ec6979::t_f268850b03be6c 20-22,705-707,3285-3286
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "604a433e8782181fefabebbc7775d06c20cd8ecc",
+  "prompts": {},
+  "sessions": {
+    "s_dab8bbe6ec6979": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "df330f95-06cc-4158-a2b1-06dbf2787923",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
