@@ -1,4 +1,5 @@
 import { AppViewProvider, useAppView } from "./app-view";
+import { UpdateCard } from "./components/update-card";
 import { Library } from "./pages/library";
 import { Settings } from "./pages/settings";
 import { FullPlayer } from "./player/full-player";
@@ -23,6 +24,7 @@ function AppShell(): React.JSX.Element {
     <>
       {renderMain()}
       {activeSongId === null ? null : <MiniPlayer />}
+      <UpdateCard />
     </>
   );
 }

@@ -25,6 +25,7 @@ import {
   type ModelStatus,
   type Settings,
   type Song,
+  type UpdateInfo,
 } from "../shared/types";
 import { isMigrating, setMigrating } from "./migration-state";
 import {
@@ -46,15 +47,43 @@ import {
   removeSong as removeSongFromStore,
 } from "./store/library";
 import { migrateDataDir, validateDestination } from "./store/move-data";
+import {
+  downloadUpdate,
+  fetchLatestUpdate,
+  installAndRelaunch,
+} from "./update/updater";
 import { resolveYouTubeMeta, watchUrl } from "./youtube";
+
+const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 
 let mainWindow: BrowserWindow | null = null;
 let modelDownloadAbort: AbortController | null = null;
+let updateDownloadAbort: AbortController | null = null;
 
-function broadcast(channel: string, payload: Song | JobProgress): void {
+function broadcast(
+  channel: string,
+  payload: Song | JobProgress | UpdateInfo
+): void {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send(channel, payload);
   }
+}
+
+/**
+ * Fire-and-forget background update check. Only surfaces something to the
+ * renderer when a newer release is actually found; failures (offline, rate
+ * limited, etc.) are silently swallowed since this runs unprompted.
+ */
+function checkForUpdateInBackground(): void {
+  fetchLatestUpdate()
+    .then((info) => {
+      if (info) {
+        broadcast(IpcChannel.UpdateAvailable, info);
+      }
+    })
+    .catch(() => {
+      // Best-effort; the next periodic check (or a manual one) will retry.
+    });
 }
 
 /**
@@ -284,6 +313,34 @@ function registerIpcHandlers(): void {
     return validateDestination(dataDir, dest);
   });
 
+  ipcMain.handle(IpcChannel.CheckForUpdate, () => fetchLatestUpdate());
+
+  ipcMain.handle(IpcChannel.StartUpdate, async (event, info: UpdateInfo) => {
+    updateDownloadAbort = new AbortController();
+    let zipPath: string;
+    try {
+      zipPath = await downloadUpdate(
+        info,
+        (fraction) => {
+          if (!event.sender.isDestroyed()) {
+            event.sender.send(IpcChannel.UpdateDownloadProgress, {
+              pct: fraction * 100,
+            });
+          }
+        },
+        updateDownloadAbort.signal
+      );
+    } finally {
+      updateDownloadAbort = null;
+    }
+    // Quits the app as part of installing; nothing runs after this on success.
+    installAndRelaunch(zipPath);
+  });
+
+  ipcMain.handle(IpcChannel.CancelUpdate, () => {
+    updateDownloadAbort?.abort();
+  });
+
   ipcMain.handle(IpcChannel.MoveDataDir, async (event, dest: string) => {
     if (isMigrating()) {
       throw new Error("A move is already in progress.");
@@ -345,6 +402,13 @@ app.whenReady().then(async () => {
 
   // Recover any jobs interrupted by a crash/force-quit, then drain the backlog.
   resumeQueue();
+
+  // Auto-update only makes sense for a packaged app living in a `.app`
+  // bundle that can be swapped in place; dev builds skip it entirely.
+  if (app.isPackaged) {
+    checkForUpdateInBackground();
+    setInterval(checkForUpdateInBackground, UPDATE_CHECK_INTERVAL_MS);
+  }
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

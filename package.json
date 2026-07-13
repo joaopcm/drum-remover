@@ -4,7 +4,7 @@
   "description": "Socrash - offline drum remover for macOS",
   "main": "./out/main/index.js",
   "author": "joaopcm",
-  "homepage": "https://github.com/joaopcm/drum-remover",
+  "homepage": "https://github.com/joaopcm/socrash",
   "scripts": {
     "dev": "electron-vite dev",
     "start": "electron-vite preview",

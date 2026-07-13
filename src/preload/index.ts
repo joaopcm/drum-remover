@@ -6,11 +6,15 @@ import type {
   MigrationProgress,
   ModelDownloadProgress,
   Song,
+  UpdateDownloadProgress,
+  UpdateInfo,
 } from "../shared/types";
 
 const api: SocrashApi = {
   addSong: (ytUrl) => ipcRenderer.invoke(IpcChannel.AddSong, ytUrl),
   cancelModelDownload: () => ipcRenderer.invoke(IpcChannel.CancelModelDownload),
+  cancelUpdate: () => ipcRenderer.invoke(IpcChannel.CancelUpdate),
+  checkForUpdate: () => ipcRenderer.invoke(IpcChannel.CheckForUpdate),
   chooseDataDir: () => ipcRenderer.invoke(IpcChannel.ChooseDataDir),
   downloadModel: (quality) =>
     ipcRenderer.invoke(IpcChannel.DownloadModel, quality),
@@ -49,11 +53,29 @@ const api: SocrashApi = {
     ipcRenderer.on(IpcChannel.SongUpdate, listener);
     return () => ipcRenderer.removeListener(IpcChannel.SongUpdate, listener);
   },
+  onUpdateAvailable: (cb) => {
+    const listener = (_event: IpcRendererEvent, info: UpdateInfo) => cb(info);
+    ipcRenderer.on(IpcChannel.UpdateAvailable, listener);
+    return () => {
+      ipcRenderer.removeListener(IpcChannel.UpdateAvailable, listener);
+    };
+  },
+  onUpdateDownloadProgress: (cb) => {
+    const listener = (
+      _event: IpcRendererEvent,
+      progress: UpdateDownloadProgress
+    ) => cb(progress);
+    ipcRenderer.on(IpcChannel.UpdateDownloadProgress, listener);
+    return () => {
+      ipcRenderer.removeListener(IpcChannel.UpdateDownloadProgress, listener);
+    };
+  },
   removeSong: (id) => ipcRenderer.invoke(IpcChannel.RemoveSong, id),
   resolveYouTubeMeta: (url) =>
     ipcRenderer.invoke(IpcChannel.ResolveYouTubeMeta, url),
   retrySong: (id) => ipcRenderer.invoke(IpcChannel.RetrySong, id),
   setSettings: (patch) => ipcRenderer.invoke(IpcChannel.SetSettings, patch),
+  startUpdate: (info) => ipcRenderer.invoke(IpcChannel.StartUpdate, info),
   validateDataDir: (dest) =>
     ipcRenderer.invoke(IpcChannel.ValidateDataDir, dest),
 };

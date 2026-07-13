@@ -116,3 +116,19 @@ export interface AppInfo {
   platform: string;
   version: string;
 }
+
+/** A GitHub release newer than the running build, ready to install. */
+export interface UpdateInfo {
+  /** Release body (markdown), shown as changelog text in the update card. */
+  notes: string | null;
+  /** The release's git tag, e.g. `v0.1.0-build.42`. */
+  tag: string;
+  /** Size of the mac `.zip` asset in bytes, for the progress indicator. */
+  zipSize: number;
+  zipUrl: string;
+}
+
+/** Progress of an in-flight update download (0..100). */
+export interface UpdateDownloadProgress {
+  pct: number;
+}
