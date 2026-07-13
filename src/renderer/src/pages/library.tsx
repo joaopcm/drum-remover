@@ -164,7 +164,7 @@ export function Library(): React.JSX.Element {
             <div className="group relative mb-4">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-faint transition-colors group-focus-within:text-muted" />
               <input
-                className="h-10 w-full rounded-[var(--radius)] border border-border bg-surface/60 pr-9 pl-9 text-sm outline-none transition-[border-color,box-shadow] duration-150 ease-[var(--ease-out-quart)] placeholder:text-faint focus-visible:border-rest focus-visible:ring-2 focus-visible:ring-rest/25"
+                className="h-10 w-full rounded-[var(--radius)] border border-border bg-surface/60 pr-9 pl-9 text-sm outline-none transition-colors duration-150 ease-[var(--ease-out-quart)] placeholder:text-faint focus-visible:border-border-strong"
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search by title or artist…"
                 ref={searchRef}
