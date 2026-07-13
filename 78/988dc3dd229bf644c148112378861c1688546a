@@ -1,0 +1,21 @@
+src/renderer/src/components/add-song-dialog.tsx
+  s_3d45fc0f4eceff::t_f9f87419e5f2ec 152-160,162-184,186,188-192
+  s_3d45fc0f4eceff::t_f6c6a6844a751c 12,15
+  s_3d45fc0f4eceff::t_c046507720f71e 19-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "78988dc3dd229bf644c148112378861c1688546a",
+  "prompts": {},
+  "sessions": {
+    "s_3d45fc0f4eceff": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0a06378b-5772-43a3-98f6-7d379d3e43c5",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
