@@ -14,6 +14,7 @@ import {
   RotateCcw,
   RotateCw,
   SkipBack,
+  SkipForward,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -286,6 +287,17 @@ export function FullPlayer(): React.JSX.Element {
                       10
                     </span>
                   </span>
+                </Button>
+              </Tooltip>
+              <Tooltip label="Skip to end" side="top">
+                <Button
+                  aria-label="Skip to end"
+                  disabled={transportDisabled}
+                  onClick={() => skipTo(durationSec)}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <SkipForward className="size-5" />
                 </Button>
               </Tooltip>
             </div>
