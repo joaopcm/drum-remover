@@ -1,0 +1,31 @@
+src/renderer/src/components/ui/button.tsx
+  s_dab8bbe6ec6979::t_6ab8bc83b7d400 22
+src/renderer/src/pages/settings.tsx
+  s_dab8bbe6ec6979::t_946b63e97fc53e 126,134
+src/renderer/src/pages/library.tsx
+  s_dab8bbe6ec6979::t_babd404f3e06b7 8,17
+  s_dab8bbe6ec6979::t_b78870b8960712 90-107
+  s_dab8bbe6ec6979::t_f759e689883c32 29
+  s_dab8bbe6ec6979::t_bcbfb7ea8133cf 147
+  s_dab8bbe6ec6979::t_dae56d3b029ee6 171,184-189
+src/renderer/src/player/full-player.tsx
+  s_dab8bbe6ec6979::t_5b0448844a18dd 111-112,114-115,117
+src/renderer/src/player/mini-player.tsx
+  s_dab8bbe6ec6979::t_ed7416431c4c40 82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "f39b75d33b0500e1743fc6b3861e276ffd8df98f",
+  "prompts": {},
+  "sessions": {
+    "s_dab8bbe6ec6979": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "df330f95-06cc-4158-a2b1-06dbf2787923",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
