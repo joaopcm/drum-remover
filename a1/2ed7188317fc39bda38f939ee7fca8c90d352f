@@ -1,0 +1,19 @@
+src/renderer/src/components/ui/input.tsx
+  s_ffd565b3335385::t_0747eda866c618 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "a12ed7188317fc39bda38f939ee7fca8c90d352f",
+  "prompts": {},
+  "sessions": {
+    "s_ffd565b3335385": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "98a4d7bf-ac55-4e95-b9c1-179c389fb448",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
