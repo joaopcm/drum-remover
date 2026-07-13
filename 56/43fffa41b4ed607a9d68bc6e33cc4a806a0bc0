@@ -1,0 +1,40 @@
+src/renderer/src/components/song-row.tsx
+  s_ab2c937886c608::t_fba79d29a83f9f 167
+src/renderer/src/components/ui/dropdown-menu.tsx
+  s_e8b82bf0071ee2::t_9f8a5c4342ec82 37-39
+src/renderer/src/player/full-player.tsx
+  s_498369abe63bdd::t_5cd32032a98aaa 258-263
+  s_498369abe63bdd::t_a6023feefe7313 14-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "5643fffa41b4ed607a9d68bc6e33cc4a806a0bc0",
+  "prompts": {},
+  "sessions": {
+    "s_498369abe63bdd": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7c2a36c1-ba20-47b6-9fc3-d58aa78f7a8c",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    },
+    "s_ab2c937886c608": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1008dafd-5e26-41b5-8690-6927e6c550b5",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    },
+    "s_e8b82bf0071ee2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8165ff28-67cc-461f-a735-809df56c4a21",
+        "model": "claude-opus-4-8-thinking-high"
+      },
+      "human_author": "João Melo <jopcmelo@gmail.com>"
+    }
+  }
+}
