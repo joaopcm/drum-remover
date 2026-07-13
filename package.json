@@ -26,6 +26,7 @@
     "@base-ui-components/react": "1.0.0-rc.0",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@fontsource-variable/bricolage-grotesque": "^5.2.10",
     "@fontsource-variable/geist": "^5.2.9",
     "@fontsource-variable/geist-mono": "^5.2.8",
     "@tailwindcss/vite": "^4.3.2",

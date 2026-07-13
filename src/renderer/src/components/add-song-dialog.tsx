@@ -7,12 +7,36 @@ import {
   DialogTitle,
 } from "@renderer/components/ui/dialog";
 import { Input } from "@renderer/components/ui/input";
+import { Kbd } from "@renderer/components/ui/kbd";
 import { Skeleton } from "@renderer/components/ui/skeleton";
+import { cn } from "@renderer/lib/utils";
 import type { Song, YouTubeMeta } from "@shared/types";
 import { Check, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 const RESOLVE_DEBOUNCE_MS = 450;
+
+// Reveals the metadata preview with a gentle fade + rise so its appearance
+// (and the modal growing to fit it) reads as intentional rather than jumpy.
+function PreviewReveal({ children }: { children: ReactNode }) {
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => setShown(true));
+    return () => cancelAnimationFrame(handle);
+  }, []);
+
+  return (
+    <div
+      className={cn(
+        "mt-4 transition-all duration-300 ease-[var(--ease-out-quart)] motion-reduce:transition-none",
+        shown ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
+      )}
+    >
+      {children}
+    </div>
+  );
+}
 
 interface AddSongDialogProps {
   onAdded: (song: Song) => void;
@@ -117,6 +141,7 @@ export function AddSongDialog({
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                e.preventDefault();
                 handleSubmit();
               }
             }}
@@ -124,43 +149,47 @@ export function AddSongDialog({
             value={url}
           />
 
-          <div className="mt-4 min-h-20">
-            {resolving ? (
-              <div className="flex items-center gap-3">
-                <Skeleton className="aspect-video w-28 shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
+          {resolving || meta || error ? (
+            <PreviewReveal>
+              {resolving ? (
+                <div className="flex items-center gap-3">
+                  <Skeleton className="aspect-video w-28 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
                 </div>
-              </div>
-            ) : null}
+              ) : null}
 
-            {!resolving && meta ? (
-              <div className="flex items-center gap-3">
-                <img
-                  alt=""
-                  className="aspect-video w-28 shrink-0 rounded-md border border-border object-cover"
-                  height={180}
-                  src={meta.thumbnailUrl}
-                  width={320}
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-sm">{meta.title}</p>
-                  {meta.author ? (
-                    <p className="truncate text-muted text-xs">{meta.author}</p>
-                  ) : null}
-                  <span className="mt-1.5 inline-flex items-center gap-1 text-drum text-xs">
-                    <Check className="size-3.5" />
-                    Ready to add
-                  </span>
+              {!resolving && meta ? (
+                <div className="flex items-center gap-3">
+                  <img
+                    alt=""
+                    className="aspect-video w-28 shrink-0 rounded-md border border-border object-cover"
+                    height={180}
+                    src={meta.thumbnailUrl}
+                    width={320}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-sm">{meta.title}</p>
+                    {meta.author ? (
+                      <p className="truncate text-muted text-xs">
+                        {meta.author}
+                      </p>
+                    ) : null}
+                    <span className="mt-1.5 inline-flex items-center gap-1 text-drum text-xs">
+                      <Check className="size-3.5" />
+                      Ready to add
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ) : null}
+              ) : null}
 
-            {!resolving && error ? (
-              <p className="text-destructive text-sm">{error}</p>
-            ) : null}
-          </div>
+              {!resolving && error ? (
+                <p className="text-destructive text-sm">{error}</p>
+              ) : null}
+            </PreviewReveal>
+          ) : null}
         </div>
 
         <div className="mt-5 flex justify-end gap-2">
@@ -178,6 +207,7 @@ export function AddSongDialog({
           >
             {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
             Add song
+            <Kbd className="ml-0.5" keys={["mod", "enter"]} />
           </Button>
         </div>
       </DialogPopup>

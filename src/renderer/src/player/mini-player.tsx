@@ -1,19 +1,13 @@
 import { useAppView } from "@renderer/app-view";
 import { Button } from "@renderer/components/ui/button";
+import { Tooltip } from "@renderer/components/ui/tooltip";
 import { cn } from "@renderer/lib/utils";
 import type { Song } from "@shared/types";
 import { ChevronUp, Loader2, Music, Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePlayer } from "./player-provider";
 import { offsetToTime, timeToFraction } from "./time";
-
-function isTypingTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-  const tag = target.tagName;
-  return tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable;
-}
+import { isTypingTarget } from "./typing-target";
 
 /**
  * Persistent, Spotify-style bar docked to the bottom of the window. Rendered
@@ -55,6 +49,8 @@ export function MiniPlayer(): React.JSX.Element {
       if (
         !minimized ||
         event.code !== "Space" ||
+        event.metaKey ||
+        event.ctrlKey ||
         isTypingTarget(event.target)
       ) {
         return;
@@ -83,7 +79,7 @@ export function MiniPlayer(): React.JSX.Element {
   } else if (playing) {
     transportIcon = <Pause className="size-5" />;
   } else {
-    transportIcon = <Play className="size-5 translate-x-0.5" />;
+    transportIcon = <Play className="size-5 translate-x-px" />;
   }
 
   return (
@@ -135,24 +131,28 @@ export function MiniPlayer(): React.JSX.Element {
           </p>
         </div>
 
-        <Button
-          aria-label={playing ? "Pause" : "Play"}
-          className="size-10 rounded-full"
-          disabled={loading}
-          onClick={toggle}
-          size="icon"
-        >
-          {transportIcon}
-        </Button>
+        <Tooltip keys={["space"]} label={playing ? "Pause" : "Play"} side="top">
+          <Button
+            aria-label={playing ? "Pause" : "Play"}
+            className="size-10 rounded-full"
+            disabled={loading}
+            onClick={toggle}
+            size="icon"
+          >
+            {transportIcon}
+          </Button>
+        </Tooltip>
 
-        <Button
-          aria-label="Expand player"
-          onClick={restorePlayer}
-          size="icon"
-          variant="ghost"
-        >
-          <ChevronUp className="size-5" />
-        </Button>
+        <Tooltip keys={["mod", "up"]} label="Expand" side="top">
+          <Button
+            aria-label="Expand player"
+            onClick={restorePlayer}
+            size="icon"
+            variant="ghost"
+          >
+            <ChevronUp className="size-5" />
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );

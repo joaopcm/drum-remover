@@ -12,6 +12,7 @@ interface WaveformProps {
 }
 
 const LANE_GAP = 10;
+const HEAD_RADIUS = 5;
 const CENTER_LINE_ALPHA = 0.28;
 const LANE_FILL_ALPHA = 0.85;
 // Volume maps to lane opacity, not height. A muted lane stays clearly visible
@@ -154,17 +155,21 @@ export function Waveform({
 
     const fraction = timeToFraction(positionSec, durationSec);
     const playheadX = fraction * size.width;
+    const clampedX = Math.min(
+      size.width - HEAD_RADIUS,
+      Math.max(HEAD_RADIUS, playheadX)
+    );
     ctx.strokeStyle = foreground;
     ctx.globalAlpha = 0.9;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(playheadX, 0);
-    ctx.lineTo(playheadX, size.height);
+    ctx.moveTo(clampedX, 0);
+    ctx.lineTo(clampedX, size.height);
     ctx.stroke();
 
     ctx.fillStyle = foreground;
     ctx.beginPath();
-    ctx.arc(playheadX, 0, 5, 0, Math.PI * 2);
+    ctx.arc(clampedX, HEAD_RADIUS, HEAD_RADIUS, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = 1;
   }, [peaks, positionSec, durationSec, drumVolume, restVolume, size]);

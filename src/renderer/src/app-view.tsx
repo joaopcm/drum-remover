@@ -11,13 +11,16 @@ export type AppView = "library" | "player" | "settings";
 
 interface AppViewState {
   activeSongId: string | null;
+  addSongOpen: boolean;
   closePlayer: () => void;
   closeSettings: () => void;
   minimized: boolean;
   minimizePlayer: () => void;
+  openAddSong: () => void;
   openPlayer: (songId: string) => void;
   openSettings: () => void;
   restorePlayer: () => void;
+  setAddSongOpen: (open: boolean) => void;
   view: AppView;
 }
 
@@ -38,6 +41,11 @@ export function AppViewProvider({
   const [view, setView] = useState<AppView>("library");
   const [activeSongId, setActiveSongId] = useState<string | null>(null);
   const [minimized, setMinimized] = useState(false);
+  const [addSongOpen, setAddSongOpen] = useState(false);
+
+  const openAddSong = useCallback(() => {
+    setAddSongOpen(true);
+  }, []);
 
   const openPlayer = useCallback((songId: string) => {
     setActiveSongId(songId);
@@ -71,21 +79,26 @@ export function AppViewProvider({
   const value = useMemo<AppViewState>(
     () => ({
       activeSongId,
+      addSongOpen,
       closePlayer,
       closeSettings,
       minimized,
       minimizePlayer,
+      openAddSong,
       openPlayer,
       openSettings,
       restorePlayer,
+      setAddSongOpen,
       view,
     }),
     [
       activeSongId,
+      addSongOpen,
       closePlayer,
       closeSettings,
       minimized,
       minimizePlayer,
+      openAddSong,
       openPlayer,
       openSettings,
       restorePlayer,
